@@ -8,6 +8,8 @@ const text = {
   "en": {
     "text_network_info": `Please set network to Ropsten`,
     "text_project_created": `Project created`,
+    "text_project_creating": `Creating project on blockchain...`,
+    "text_project_none": `You have no projects`,
     "success_image_upload": `Image uploaded`,
     "error_project_created": 'Error creating project',
     "error_invalid_network": `Network is not supported`,

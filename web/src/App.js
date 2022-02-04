@@ -133,8 +133,8 @@ function App() {
     
     if(contractChanged) {
       (async () => {
-        let projects = await contract.getProjectsForUser(accounts[0]);
-        console.log('PROJECTS', projects);
+        let _projects = await contract.getProjectsForUser(accounts[0]);
+        setProjects(_projects);
       })();
     }
   }, [contractAddress, contract]);
@@ -176,7 +176,7 @@ function App() {
       let timeStamp = Math.floor(new Date(projectEntry.dueDate).getTime() / 1000);
 
       try {
-        await contract.createProject(
+        let tx = await contract.createProject(
           projectEntry.name, 
           projectEntry.description, 
           projectEntry.uri,
@@ -184,7 +184,22 @@ function App() {
           wei.toString()
         );
 
-        toast(getText('text_project_created'))
+        console.log('tx', tx);
+
+        let _projects = await contract.getProjectsForUser(accounts[0]);
+        setProjects(_projects);
+
+        provider.once(tx.hash, function(tx) {
+          console.log('tx complete ', tx);
+          toast('tx complete ' + JSON.stringify(tx));
+
+          (async () => {
+            let _projects = await contract.getProjectsForUser(accounts[0]);
+            setProjects(_projects);
+          })();
+        })
+
+        toast(getText('text_project_creating'))
       }
       catch(e) {
         toast(getText('error_project_created'))
@@ -251,6 +266,17 @@ function App() {
     </div>
   }
 
+  function getProjectsList(projects) {
+    let rows = [];
+    for(let proj of projects) {
+      rows.push(<div className="br-project-row" key={proj[0].toString()}>
+        <div className="br-project-name">{proj[3]}</div>
+        <div className="br-project-description">{proj[4]}</div>
+      </div>);
+    }
+    return rows;
+  }
+
   function getProfilePage() {
     let ui;
 
@@ -259,10 +285,11 @@ function App() {
       <div>
         { projects.length ? 
           <div className="br-projects-list">
+            { getProjectsList(projects) }
           </div>  
           :
           <div className="br-info-message">
-            You have no projects
+            {getText('text_project_none')}
           </div>
         }
       </div>
