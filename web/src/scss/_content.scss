@@ -232,10 +232,6 @@
 .br-feature-panel {
     display: flex;
     flex-direction: column;
-    width: 50%;
-    border: 2px solid $color-1-l4;
-    border-radius: $spacing-md;
-    margin: $spacing-sm;
 }
 
 .br-feature-row {
@@ -555,4 +551,20 @@
     border: 2px solid $color-1-l4;
     padding: $spacing-md;
     border-radius: $spacing-md;
+}
+
+.br-profile-panels {
+    display: flex;
+}
+
+.br-profile-panel {
+    padding: $spacing-sm;
+    flex: 1;
+    border: 2px solid $color-1-l4;
+    border-radius: $spacing-md;
+    margin: $spacing-sm;
+}
+
+.br-project-row {
+    margin-bottom: $spacing-sm;
 }

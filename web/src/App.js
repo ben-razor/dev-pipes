@@ -282,19 +282,24 @@ function App() {
 
     ui = <div>
       <h1>Profile Page</h1>
-      <div>
-        { projects.length ? 
-          <div className="br-projects-list">
-            { getProjectsList(projects) }
-          </div>  
-          :
-          <div className="br-info-message">
-            {getText('text_project_none')}
+      <div className="br-profile-panels">
+        <div className="br-profile-panel">
+          <div> 
+            <h3>Your Projects</h3>
+            { projects.length ? 
+              <div className="br-projects-list">
+                { getProjectsList(projects) }
+              </div>  
+              :
+              <div className="br-info-message">
+                {getText('text_project_none')}
+              </div>
+            }
           </div>
-        }
-      </div>
-      <div>
-        { getCreateProjectForm() }
+        </div>
+        <div className="br-profile-panel">
+          { getCreateProjectForm() }
+        </div>
       </div>
     </div>
 
