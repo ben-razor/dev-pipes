@@ -217,6 +217,60 @@ function App() {
     e.preventDefault();
   }
 
+  function getProjectTable(project) {
+    return <div className="br-feature-panel">
+
+      <div className="br-feature-row">
+        <div className="br-feature-label">
+          Name
+        </div>
+        <div className="br-feature-control">
+          {project.name}
+        </div>
+      </div>
+      <div className="br-feature-row">
+        <div className="br-feature-label">
+          Description 
+        </div>
+        <div className="br-feature-control">
+          {project.description}
+        </div>
+      </div>
+      <div className="br-feature-row">
+        <div className="br-feature-label">
+          Media URI
+        </div>
+        <div className="br-feature-control">
+          {project.uri}
+        </div>
+      </div>
+      <div className="br-feature-row">
+        <div className="br-feature-label">
+          Due Date
+        </div>
+        <div className="br-feature-control">
+          {formatDate(dateFromBigNumber(project.dueDate))} 
+        </div>
+      </div>
+      <div className="br-feature-row">
+        <div className="br-feature-label">
+          Budget (Eth)
+        </div>
+        <div className="br-feature-control">
+          {ethers.utils.formatEther(project.payment.toString())}
+        </div>
+      </div>
+    </div>
+  }
+
+  function dateFromBigNumber(dateBN) {
+    return new Date(parseInt(dateBN.toString()) * 1000);
+  }
+
+  function formatDate(date) {
+    return date.toISOString().substr(0, 16).replace('T', ' ');
+  }
+
   function getCreateProjectForm() {
     return <div className="br-feature-panel">
 
@@ -298,7 +352,7 @@ function App() {
             <div className="br-project-description">{proj.description}</div>
           </div>
           <div className="br-project-details-right">
-            <BrButton type="sumbit" label="Select" id="selectProject" 
+            <BrButton type="sumbit" label="Select" id={'selectProject' + projID} key={'submit' + projID}
                       className="br-button br-icon-button" onClick={e => selectProject(projID)}/>
           </div>
         </div>
@@ -345,6 +399,9 @@ function App() {
                   onClick={e => setActiveProject({})} />
       </div>
       <h1>{ activeProject.name }</h1>
+      <div className="br-active-project-page">
+        { getProjectTable(activeProject) }
+      </div>
 
     </div>
   }
