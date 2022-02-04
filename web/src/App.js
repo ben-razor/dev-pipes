@@ -38,6 +38,7 @@ function App() {
   const [ network, setNetwork ] = useState({});
   const [ networkId, setNetworkId ] = useState();
   const [ provider, setProvider ] = useState();
+  const [ signer, setSigner ] = useState();
   const [ contract, setContract ] = useState();
   const [ contractAddress, setContractAddress ] = useState();
   const [ isSignedIn, setIsSignedIn ] = useState();
@@ -51,6 +52,7 @@ function App() {
       console.log('Eth connected', accounts);
       setAccounts(accounts);
       setProvider(provider);
+      setSigner(signer);
       const network = await provider.getNetwork();
       setNetworkId(parseInt(network.chainId));
 
@@ -117,15 +119,14 @@ function App() {
 
   useEffect(() => {
     if(isSignedIn && validNetwork(networkId)) {
-      let contract = new ethers.Contract(networkConfig.contractAddress, networkConfig.abi, provider);
+      let contract = new ethers.Contract(networkConfig.contractAddress, networkConfig.abi, signer);
       if(contract) {
         console.log('contract', contract);
         setContract(contract);
         setContractAddress(contract.address);
-
       }
     }
-  }, [isSignedIn, networkId, provider]);
+  }, [isSignedIn, networkId, signer]);
 
   useEffect(() => {
     let contractChanged = stateCheck.changed('contractAddress1', contractAddress);
@@ -154,7 +155,7 @@ function App() {
 
   let todaysDate = new Date().toISOString().substr(0, 16);
   const [ projectEntry, setProjectEntry ] = useState({
-    name: '', description: '', mediaURI: '', dueDate: todaysDate, budget: 0
+    name: '', description: '', uri: '', dueDate: todaysDate, budget: 0
   });
 
   function projectFormChanged(e, field) {
@@ -163,20 +164,48 @@ function App() {
     setProjectEntry(_projectEntry);
   }
 
-  function submitProject() {
-    toast(getText('text_project_created'))
+  function submitProject(e) {
+    (async () => {
+      let dueDate = Math.floor(Date.now() / 1000);
+      let payment = 10n;
+      let oneEth = payment**18n;
+
+      let wei = ethers.utils.parseEther(projectEntry.budget);
+      console.log('wei', wei);
+
+      let timeStamp = Math.floor(new Date(projectEntry.dueDate).getTime() / 1000);
+
+      try {
+        await contract.createProject(
+          projectEntry.name, 
+          projectEntry.description, 
+          projectEntry.uri,
+          timeStamp,
+          wei.toString()
+        );
+
+        toast(getText('text_project_created'))
+      }
+      catch(e) {
+        toast(getText('error_project_created'))
+        console.log(e);
+      }
+    })();
+
+    e.preventDefault();
   }
 
   function getCreateProjectForm() {
     return <div className="br-feature-panel">
 
       <h3>Create New Project</h3>
+      <form onSubmit={ e => submitProject(e) }>
       <div className="br-feature-row">
         <div className="br-feature-label">
           Name
         </div>
         <div className="br-feature-control">
-          <input type="text" value={projectEntry.name} onChange={e => projectFormChanged(e, 'name') } />
+          <input type="text" minLength="4" required value={projectEntry.name} onChange={e => projectFormChanged(e, 'name') } />
         </div>
       </div>
       <div className="br-feature-row">
@@ -184,7 +213,7 @@ function App() {
           Description 
         </div>
         <div className="br-feature-control">
-          <input type="text" value={projectEntry.description} onChange={e => projectFormChanged(e, 'description') } />
+          <input type="text" minLength="8" required value={projectEntry.description} onChange={e => projectFormChanged(e, 'description') } />
         </div>
       </div>
       <div className="br-feature-row">
@@ -192,7 +221,7 @@ function App() {
           Media URI
         </div>
         <div className="br-feature-control">
-          <input type="text" value={projectEntry.uri} onChange={e => projectFormChanged(e, 'uri') } />
+          <input type="text" minLength="20" required value={projectEntry.uri} onChange={e => projectFormChanged(e, 'uri') } />
         </div>
       </div>
       <div className="br-feature-row">
@@ -205,19 +234,20 @@ function App() {
       </div>
       <div className="br-feature-row">
         <div className="br-feature-label">
-          Budget
+          Budget (Eth)
         </div>
         <div className="br-feature-control">
-          <input type="number" value={projectEntry.budget} onChange={e => projectFormChanged(e, 'budget') } />
+          <input type="number" value={projectEntry.budget} step="0.0001" min="0" onChange={e => projectFormChanged(e, 'budget') } />
         </div>
       </div>
       <div className="br-feature-row">
         <div className="br-feature-label">
         </div>
         <div className="br-feature-control">
-          <BrButton label="Create Project" id="createProject" className="br-button br-icon-button" onClick={ submitProject } />
+          <BrButton type="sumbit" label="Create Project" id="createProject" className="br-button br-icon-button" />
         </div>
       </div>
+      </form>
     </div>
   }
 
