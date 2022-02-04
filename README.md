@@ -1,4 +1,4 @@
-# dev-pipes
+# Dev Pipes
 
 A decentralized project management app with automatic payment flows.
 
