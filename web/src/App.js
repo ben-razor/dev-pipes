@@ -271,10 +271,9 @@ function App() {
     return date.toISOString().substr(0, 16).replace('T', ' ');
   }
 
-  function getCreateProjectForm() {
+  function getCreateProjectForm(type='create') {
     return <div className="br-feature-panel">
-
-      <h3>Create New Project</h3>
+      <h3>{ type === 'create' ? 'Create New Project' : 'Edit Project' }</h3>
       <form onSubmit={ e => submitProject(e) }>
       <div className="br-feature-row">
         <div className="br-feature-label">
@@ -320,7 +319,8 @@ function App() {
         <div className="br-feature-label">
         </div>
         <div className="br-feature-control">
-          <BrButton type="sumbit" label="Create Project" id="createProject" className="br-button br-icon-button" />
+          <BrButton type="sumbit" label={ type === 'create' ? "Create Project" : "Submit" } id="createProject" 
+                    className="br-button br-icon-button" />
         </div>
       </div>
       </form>
@@ -365,8 +365,8 @@ function App() {
     let ui;
 
     ui = <div>
-      <div className="br-profile-panels">
-        <div className="br-profile-panel">
+      <div className="br-page-panels">
+        <div className="br-page-panel">
           <div> 
             <h3>Your Projects</h3>
             { projects.length ? 
@@ -391,7 +391,25 @@ function App() {
     </div>
   }
 
+  function sameAccount(acc1, acc2) {
+    return acc1.toLowerCase() === acc2.toLowerCase();
+  }
+
+  useEffect(() => {
+    if(activeProject.id) {
+      let _projectEntry = { ...projectEntry };
+      _projectEntry.name = activeProject.name;
+      _projectEntry.description = activeProject.description;
+      _projectEntry.uri = activeProject.uri;
+
+      _projectEntry.dueDate = dateFromBigNumber(activeProject.dueDate).toISOString().substr(0, 16);
+      _projectEntry.budget = ethers.utils.formatEther(activeProject.payment.toString());
+      setProjectEntry(_projectEntry);
+    }
+  }, [activeProject]);
+
   function getActiveProjectPage(activeProject) {
+    console.log('CA', activeProject.creator, accounts[0]);
     return <div className="br-active-project-page">
       <div className="br-back-button-holder">
         <BrButton label={<i className="fa fa-arrow-left"></i>} id="goBackActiveProject" 
@@ -399,8 +417,17 @@ function App() {
                   onClick={e => setActiveProject({})} />
       </div>
       <h1>{ activeProject.name }</h1>
-      <div className="br-active-project-page">
-        { getProjectTable(activeProject) }
+      <div className="br-page-panels">
+        <div className="br-page-panel">
+          <div className="br-active-project-page">
+            { 
+              sameAccount(activeProject.creator, accounts[0]) ?
+              getCreateProjectForm('edit')
+              :
+              getProjectTable(activeProject) 
+            }
+          </div>
+        </div>
       </div>
 
     </div>
