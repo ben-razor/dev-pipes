@@ -546,3 +546,9 @@
 .br-sign-in-panel {
     margin-top: 1.5em;
 }
+
+.br-info-message {
+    border: 2px solid $color-1-l4;
+    padding: $spacing-md;
+    border-radius: $spacing-md;
+}

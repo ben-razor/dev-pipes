@@ -59,6 +59,8 @@ function App() {
         console.log('new accounts ', x);
         setAccounts(x);
       });
+
+      setIsSignedIn(true);
     })();
   }, []);
 
@@ -107,7 +109,13 @@ function App() {
   }, [accounts, provider, networkId]);
 
   function signIn() {
-    connectEthereum();
+    if(!isSignedIn) {
+      connectEthereum();
+    }
+    else {
+      setAccounts([]);
+      setIsSignedIn(false);
+    }
   }
 
   function signInUnstoppable() {
@@ -115,7 +123,15 @@ function App() {
   }
 
   function getProfilePage() {
+    let ui;
 
+    ui = <div>
+      <h1>Profile Page</h1>
+    </div>
+
+    return <div className="br-profile-page">
+      {ui}
+    </div>
   }
 
   function validNetwork(networkId) {
@@ -141,18 +157,23 @@ function App() {
         </div>
       </div>
       <div className="br-content">
-        { isSignedIn ?
+        { (isSignedIn && validNetwork(networkId)) ?
           getProfilePage()
           :
           <div className="br-front-page">
             Decentralized project management with automatic payment flows.
             <div className="br-sign-in-panel">
-              <Fragment>
-                <BrButton label={ isSignedIn  ? "Sign out" : "Sign in"} id="signIn" className="br-button br-icon-button" onClick={signIn} />
-              </Fragment>
-              <Fragment>
-                <BrButton label={ isSignedIn  ? "Sign out" : "Sign in with Unstoppable Domains"} id="signIn" className="br-button br-icon-button" onClick={signInUnstoppable} />
-              </Fragment>
+              { !isSignedIn ? 
+                <Fragment>
+                  <BrButton label={ isSignedIn  ? "Sign out" : "Sign in"} id="signIn" className="br-button br-icon-button" onClick={signIn} />
+                  <BrButton label={ isSignedIn  ? "Sign out" : "Sign in with Unstoppable Domains"} id="signIn" className="br-button br-icon-button" onClick={signInUnstoppable} />
+                </Fragment>
+                :
+                !validNetwork(networkId) ?
+                  <div className="br-info-message">{getText('text_network_info')}</div>
+                  :
+                  ''
+              }
             </div>
             <img className="br-infographic" alt="Dev Pipes Infographic" src={Infographic} />
           </div>
