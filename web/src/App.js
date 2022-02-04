@@ -43,9 +43,12 @@ function App() {
   const [ contractAddress, setContractAddress ] = useState();
   const [ isSignedIn, setIsSignedIn ] = useState();
   const [ projects, setProjects ] = useState([]);
+  const [ activeProject, setActiveProject ] = useState({});
+  const [ page, setPage ] = useState('projects');
 
   const connectEthereum = useCallback(() => {
     (async () => {
+      console.log('conn eth')
       const provider = new ethers.providers.Web3Provider(window.ethereum)
       let accounts = await provider.send("eth_requestAccounts", []);
       const signer = provider.getSigner();
@@ -72,6 +75,10 @@ function App() {
       setIsSignedIn(true);
     })();
   }, []);
+
+  useEffect(() => {
+    connectEthereum();
+  }, [connectEthereum]);
 
   useEffect(() => {
     let networkChanged = stateCheck.changed('netChanged1', networkId);
@@ -266,22 +273,44 @@ function App() {
     </div>
   }
 
+  function selectProject(id) {
+    let _activeProject = {};
+    for(let proj of projects) {
+      let projID = proj[0].toString();
+      if(projID === id) {
+        _activeProject = proj;
+      }
+    }
+    setActiveProject(_activeProject);
+  }
+
   function getProjectsList(projects) {
     let rows = [];
+
     for(let proj of projects) {
-      rows.push(<div className="br-project-row" key={proj[0].toString()}>
-        <div className="br-project-name">{proj[3]}</div>
-        <div className="br-project-description">{proj[4]}</div>
+      let projID = proj.id.toString();
+      rows.push(<div className="br-project-row" key={projID}>
+        <div className="br-project-heading">
+          <div className="br-project-name">{proj.name}</div>
+        </div>
+        <div className="br-project-details">
+          <div className="br-project-details-left">
+            <div className="br-project-description">{proj.description}</div>
+          </div>
+          <div className="br-project-details-right">
+            <BrButton type="sumbit" label="Select" id="selectProject" 
+                      className="br-button br-icon-button" onClick={e => selectProject(projID)}/>
+          </div>
+        </div>
       </div>);
     }
     return rows;
   }
 
-  function getProfilePage() {
+  function getProjectsPage() {
     let ui;
 
     ui = <div>
-      <h1>Profile Page</h1>
       <div className="br-profile-panels">
         <div className="br-profile-panel">
           <div> 
@@ -305,6 +334,52 @@ function App() {
 
     return <div className="br-profile-page">
       {ui}
+    </div>
+  }
+
+  function getActiveProjectPage(activeProject) {
+    return <div className="br-active-project-page">
+      <div className="br-back-button-holder">
+        <BrButton label={<i className="fa fa-arrow-left"></i>} id="goBackActiveProject" 
+                  className="br-button br-icon-button" 
+                  onClick={e => setActiveProject({})} />
+      </div>
+      <h1>{ activeProject.name }</h1>
+
+    </div>
+  }
+
+  function getActiveTabClass(id) {
+    let activeClass = (id === page ? ' br-page-heading-active ' : '');
+    return activeClass;
+  }
+
+  function getPageTab(id, text) {
+    let tabClass = "br-page-heading";
+
+    return <div className={tabClass + getActiveTabClass(id)} onClick={e => setPage(id)}>
+      {text}
+    </div>
+  }
+
+  function getPageHeadings() {
+    return <div className="br-page-headings">
+      {getPageTab('projects', 'Your Projects')}
+      {getPageTab('tasks', 'Your Tasks')}
+      {getPageTab('search', 'Search')}
+    </div>
+  }
+
+  function getMainPages() {
+    return <div class="br-pages">
+      { activeProject?.id ?
+        getActiveProjectPage(activeProject)
+        :
+        <Fragment>
+          {getPageHeadings()}
+          {getProjectsPage()}
+        </Fragment>
+      }
     </div>
   }
 
@@ -332,7 +407,7 @@ function App() {
       </div>
       <div className="br-content">
         { (isSignedIn && validNetwork(networkId)) ?
-          getProfilePage()
+          getMainPages()
           :
           <div className="br-front-page">
             Decentralized project management with automatic payment flows.

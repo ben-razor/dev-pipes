@@ -568,3 +568,55 @@
 .br-project-row {
     margin-bottom: $spacing-sm;
 }
+
+.br-page-headings {
+    display: flex;
+    border-bottom: 1px solid $color-1-l2;
+    color: white;
+    cursor: default;
+    user-select: none;
+    justify-content: center;
+}
+
+.br-page-heading {
+    padding: 0.8em 1em;
+    background-color: grey;
+    min-width: 8em;
+    border-radius: 1em 1em 0 0;
+    margin-right: 0.3em;
+}
+
+.br-page-heading-active {
+    background-color: $color-1-l2;
+}
+
+.br-project-heading {
+    background-color: $color-1-l2;
+    color: white;
+    padding: 0.2em;
+    text-align: left;
+}
+
+.br-project-name {
+
+}
+
+.br-project-description {
+    text-align: left;
+}
+
+.br-project-details {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: $spacing-sm 0;
+}
+
+.br-project-details-left {
+    flex: 2;
+}
+
+.br-project-details-right {
+    flex: 1;
+    text-align: right;
+}
