@@ -152,8 +152,9 @@ function App() {
 
   }
 
+  let todaysDate = new Date().toISOString().substr(0, 16);
   const [ projectEntry, setProjectEntry ] = useState({
-    name: '', description: '', mediaURI: '', dueDate: new Date().toISOString(), budget: 0
+    name: '', description: '', mediaURI: '', dueDate: todaysDate, budget: 0
   });
 
   function projectFormChanged(e, field) {
@@ -199,7 +200,7 @@ function App() {
           Due Date
         </div>
         <div className="br-feature-control">
-          <input type="date" value={projectEntry.date} onChange={e => projectFormChanged(e, 'date') } />
+          <input type="datetime-local" value={projectEntry.dueDate} onChange={e => projectFormChanged(e, 'dueDate') } />
         </div>
       </div>
       <div className="br-feature-row">
@@ -207,7 +208,7 @@ function App() {
           Budget
         </div>
         <div className="br-feature-control">
-          <input type="number" value={projectEntry.budget} onChange={e => projectFormChanged(e, 'uri') } />
+          <input type="number" value={projectEntry.budget} onChange={e => projectFormChanged(e, 'budget') } />
         </div>
       </div>
       <div className="br-feature-row">
