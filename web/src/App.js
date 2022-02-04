@@ -5,6 +5,10 @@ import './scss/styles.scss';
 import { useToasts } from 'react-toast-notifications';
 import BrButton from './js/components/lib/BrButton';
 import getText from './data/world/text';
+import { ethers } from 'ethers';
+import devPipesContract from './data/contract/DevPipes';
+import { StateCheck } from './js/helpers/helpers';
+const stateCheck = new StateCheck();
 
 const TOAST_TIMEOUT = 4000;
 
@@ -27,7 +31,78 @@ function App() {
     toast( <Fragment><div>{message1}</div><div>{message2}</div></Fragment>, type)
   }
 
+  const [ accounts, setAccounts ] = useState([]);
+  const [ network, setNetwork ] = useState({});
+  const [ networkId, setNetworkId ] = useState();
+  const [ provider, setProvider ] = useState();
+
+  const connectEthereum = useCallback(() => {
+    (async () => {
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      let accounts = await provider.send("eth_requestAccounts", []);
+      const signer = provider.getSigner();
+      console.log('Eth connected', accounts);
+      setAccounts(accounts);
+      setProvider(provider);
+      const network = await provider.getNetwork();
+      setNetworkId(network.chainId);
+
+      window.ethereum.on("chainChanged", async(x) => {
+        console.log('new net', x);
+        setNetworkId(x);
+      });
+
+      window.ethereum.on("accountsChanged", async(x) => {
+        console.log('new accounts ', x);
+        setAccounts(x);
+      });
+    })();
+  }, []);
+
+  useEffect(() => {
+    let networkChanged = stateCheck.changed('netChanged1', networkId);
+    console.log('nid', networkId, networkChanged);
+
+    if(networkChanged) {
+      if(networkId === 1) {
+        console.log('Network Ethereum');
+      }
+      else if(networkId === 3) {
+        console.log('Network Ropsten');
+      }
+      else if(networkId === 0x89) {
+        console.log('Network Matic');
+      }
+      else if(networkId === 0x13881) {
+        console.log('Network Matic Mumbai');
+      }
+
+      connectEthereum();
+    }
+  }, [networkId, connectEthereum]);
+
+  useEffect(() => {
+    if(provider) {
+      (async () => {
+        try {
+          console.log('bal ', await provider.getBalance(accounts[0]));
+        }
+        catch(e) {
+          console.log('Cannot get balance');
+        }
+      })();
+    }
+  }, [accounts, provider, networkId]);
+
   function signIn() {
+    connectEthereum();
+  }
+
+  function signInUnstoppable() {
+
+  }
+
+  function getProfilePage() {
 
   }
 
@@ -50,15 +125,23 @@ function App() {
         </div>
       </div>
       <div className="br-content">
-        <div className="br-front-page">
-          Decentralized project management with automatic payment flows.
-          <div className="br-sign-in-panel">
-            <Fragment>
-              <BrButton label={ isSignedIn  ? "Sign out" : "Sign in with Unstoppable Domains"} id="signIn" className="br-button br-icon-button" onClick={signIn} />
-            </Fragment>
+        { isSignedIn ?
+          getProfilePage()
+          :
+          <div className="br-front-page">
+            Decentralized project management with automatic payment flows.
+            <div className="br-sign-in-panel">
+              <Fragment>
+                <BrButton label={ isSignedIn  ? "Sign out" : "Sign in"} id="signIn" className="br-button br-icon-button" onClick={signIn} />
+              </Fragment>
+              <Fragment>
+                <BrButton label={ isSignedIn  ? "Sign out" : "Sign in with Unstoppable Domains"} id="signIn" className="br-button br-icon-button" onClick={signInUnstoppable} />
+              </Fragment>
+            </div>
+            <img className="br-infographic" alt="Dev Pipes Infographic" src={Infographic} />
           </div>
-          <img className="br-infographic" alt="Dev Pipes Infographic" src={Infographic} />
-        </div>
+        }
+
       </div>
     </div>
   );
