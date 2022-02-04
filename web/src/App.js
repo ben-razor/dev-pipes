@@ -49,7 +49,7 @@ function App() {
       </div>
       <div className="br-content">
         <div className="br-front-page">
-          A project manager app with automatic payment flows.
+          Decentralized project management with automatic payment flows.
           <img className="br-infographic" alt="Dev Pipes Infographic" src={Infographic} />
         </div>
       </div>
