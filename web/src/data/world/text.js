@@ -7,6 +7,7 @@ const text_consts = {
 const text = {
   "en": {
     "text_network_info": `Please set network to Ropsten`,
+    "text_project_created": `Project created`,
     "success_image_upload": `Image uploaded`,
     "error_invalid_network": `Network is not supported`,
     "error_image_upload_failed": `Image upload failed`

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, Fragment } from 'react';
-import Logo from './images/dev-pipes-1.png';
+import Logo from './images/dev-pipes-2.png';
 import Infographic from './images/infographic-1.png';
 import './scss/styles.scss';
 import { useToasts } from 'react-toast-notifications';
@@ -12,8 +12,12 @@ const stateCheck = new StateCheck();
 
 const TOAST_TIMEOUT = 4000;
 
-function App() {
+let networkConfig = {
+  contractAddress: '0xb671A76Fe1Ee4E8535d827AdD0b260Ab71A124a9',
+  abi: devPipesContract.abi
+};
 
+function App() {
 
   const { addToast } = useToasts();
 
@@ -34,7 +38,10 @@ function App() {
   const [ network, setNetwork ] = useState({});
   const [ networkId, setNetworkId ] = useState();
   const [ provider, setProvider ] = useState();
+  const [ contract, setContract ] = useState();
+  const [ contractAddress, setContractAddress ] = useState();
   const [ isSignedIn, setIsSignedIn ] = useState();
+  const [ projects, setProjects ] = useState([]);
 
   const connectEthereum = useCallback(() => {
     (async () => {
@@ -108,6 +115,29 @@ function App() {
     }
   }, [accounts, provider, networkId]);
 
+  useEffect(() => {
+    if(isSignedIn && validNetwork(networkId)) {
+      let contract = new ethers.Contract(networkConfig.contractAddress, networkConfig.abi, provider);
+      if(contract) {
+        console.log('contract', contract);
+        setContract(contract);
+        setContractAddress(contract.address);
+
+      }
+    }
+  }, [isSignedIn, networkId, provider]);
+
+  useEffect(() => {
+    let contractChanged = stateCheck.changed('contractAddress1', contractAddress);
+    
+    if(contractChanged) {
+      (async () => {
+        let projects = await contract.getProjectsForUser(accounts[0]);
+        console.log('PROJECTS', projects);
+      })();
+    }
+  }, [contractAddress, contract]);
+
   function signIn() {
     if(!isSignedIn) {
       connectEthereum();
@@ -122,11 +152,92 @@ function App() {
 
   }
 
+  const [ projectEntry, setProjectEntry ] = useState({
+    name: '', description: '', mediaURI: '', dueDate: new Date().toISOString(), budget: 0
+  });
+
+  function projectFormChanged(e, field) {
+    let _projectEntry = { ...projectEntry };
+    _projectEntry[field] = e.target.value;
+    setProjectEntry(_projectEntry);
+  }
+
+  function submitProject() {
+    toast(getText('text_project_created'))
+  }
+
+  function getCreateProjectForm() {
+    return <div className="br-feature-panel">
+
+      <h3>Create New Project</h3>
+      <div className="br-feature-row">
+        <div className="br-feature-label">
+          Name
+        </div>
+        <div className="br-feature-control">
+          <input type="text" value={projectEntry.name} onChange={e => projectFormChanged(e, 'name') } />
+        </div>
+      </div>
+      <div className="br-feature-row">
+        <div className="br-feature-label">
+          Description 
+        </div>
+        <div className="br-feature-control">
+          <input type="text" value={projectEntry.description} onChange={e => projectFormChanged(e, 'description') } />
+        </div>
+      </div>
+      <div className="br-feature-row">
+        <div className="br-feature-label">
+          Media URI
+        </div>
+        <div className="br-feature-control">
+          <input type="text" value={projectEntry.uri} onChange={e => projectFormChanged(e, 'uri') } />
+        </div>
+      </div>
+      <div className="br-feature-row">
+        <div className="br-feature-label">
+          Due Date
+        </div>
+        <div className="br-feature-control">
+          <input type="date" value={projectEntry.date} onChange={e => projectFormChanged(e, 'date') } />
+        </div>
+      </div>
+      <div className="br-feature-row">
+        <div className="br-feature-label">
+          Budget
+        </div>
+        <div className="br-feature-control">
+          <input type="number" value={projectEntry.budget} onChange={e => projectFormChanged(e, 'uri') } />
+        </div>
+      </div>
+      <div className="br-feature-row">
+        <div className="br-feature-label">
+        </div>
+        <div className="br-feature-control">
+          <BrButton label="Create Project" id="createProject" className="br-button br-icon-button" onClick={ submitProject } />
+        </div>
+      </div>
+    </div>
+  }
+
   function getProfilePage() {
     let ui;
 
     ui = <div>
       <h1>Profile Page</h1>
+      <div>
+        { projects.length ? 
+          <div className="br-projects-list">
+          </div>  
+          :
+          <div className="br-info-message">
+            You have no projects
+          </div>
+        }
+      </div>
+      <div>
+        { getCreateProjectForm() }
+      </div>
     </div>
 
     return <div className="br-profile-page">
