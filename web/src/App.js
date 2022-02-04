@@ -380,7 +380,7 @@ function App() {
             }
           </div>
         </div>
-        <div className="br-profile-panel">
+        <div className="br-page-panel">
           { getCreateProjectForm() }
         </div>
       </div>
