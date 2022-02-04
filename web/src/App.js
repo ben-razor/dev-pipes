@@ -14,27 +14,27 @@ const TOAST_TIMEOUT = 4000;
 
 function App() {
 
-  const { isSignedIn, setIsSignedIn } = useState();
 
   const { addToast } = useToasts();
 
-  function toast(message, type='info') {
+  const toast = useCallback((message, type='info') => {
     console.log('toasty ', message);
     addToast(message, { 
       appearance: type,
       autoDismiss: true,
       autoDismissTimeout: TOAST_TIMEOUT
     });
-  }
+  }, [addToast]);
 
-  function doubleToast(message1, message2, type='info') {
+  const doubleToast = useCallback((message1, message2, type='info') => {
     toast( <Fragment><div>{message1}</div><div>{message2}</div></Fragment>, type)
-  }
+  }, [toast]);
 
   const [ accounts, setAccounts ] = useState([]);
   const [ network, setNetwork ] = useState({});
   const [ networkId, setNetworkId ] = useState();
   const [ provider, setProvider ] = useState();
+  const [ isSignedIn, setIsSignedIn ] = useState();
 
   const connectEthereum = useCallback(() => {
     (async () => {
@@ -45,11 +45,14 @@ function App() {
       setAccounts(accounts);
       setProvider(provider);
       const network = await provider.getNetwork();
-      setNetworkId(network.chainId);
+      setNetworkId(parseInt(network.chainId));
+
+      window.ethereum.removeAllListeners("chainChanged");
+      window.ethereum.removeAllListeners("accountsChanged");
 
       window.ethereum.on("chainChanged", async(x) => {
         console.log('new net', x);
-        setNetworkId(x);
+        setNetworkId(parseInt(x));
       });
 
       window.ethereum.on("accountsChanged", async(x) => {
@@ -82,6 +85,15 @@ function App() {
   }, [networkId, connectEthereum]);
 
   useEffect(() => {
+    let networkChanged = stateCheck.changed('netChanged2', networkId);
+    console.log('nid', networkId, networkChanged);
+    if(networkChanged && networkId && !validNetwork(networkId)) {
+      setIsSignedIn(false);
+      doubleToast(getText('error_invalid_network'), getText('text_network_info'), 'warning');
+    }
+  }, [networkId, doubleToast]);
+
+  useEffect(() => {
     if(provider) {
       (async () => {
         try {
@@ -104,6 +116,10 @@ function App() {
 
   function getProfilePage() {
 
+  }
+
+  function validNetwork(networkId) {
+    return parseInt(networkId) === 3;
   }
 
   return (
