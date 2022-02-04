@@ -40,16 +40,23 @@ function App() {
           <img className="br-header-logo" alt="Dev Pipes Logo" src={Logo} />
         </div>
         <div className="br-header-controls-panel">
-          <div className="br-header-controls">
+          { isSignedIn ?
             <Fragment>
               <BrButton label={ isSignedIn  ? "Sign out" : "Sign in"} id="signIn" className="br-button br-icon-button" onClick={signIn} />
             </Fragment>
-          </div>
+            :
+            ''
+          }
         </div>
       </div>
       <div className="br-content">
         <div className="br-front-page">
           Decentralized project management with automatic payment flows.
+          <div className="br-sign-in-panel">
+            <Fragment>
+              <BrButton label={ isSignedIn  ? "Sign out" : "Sign in with Unstoppable Domains"} id="signIn" className="br-button br-icon-button" onClick={signIn} />
+            </Fragment>
+          </div>
           <img className="br-infographic" alt="Dev Pipes Infographic" src={Infographic} />
         </div>
       </div>
