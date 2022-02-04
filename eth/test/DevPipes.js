@@ -123,10 +123,7 @@ describe("DevPipes contract", function () {
       await 
       expect(connAddr1.addRoyalty(0, addr1.address, pointOneEth))
       .to.be.revertedWith('error_project_cannot_be_modified_after_publication');
-
     });
-
-
 
   });
 
