@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, Fragment } from 'react';
-import Logo from './images/near-karts-1.png';
+import Logo from './images/dev-pipes-1.png';
+import Infographic from './images/infographic-1.png';
 import './scss/styles.scss';
 import { useToasts } from 'react-toast-notifications';
 import BrButton from './js/components/lib/BrButton';
@@ -32,12 +33,11 @@ function App() {
 
   return (
     <div className="br-page">
-      <img className="br-header-logo" alt="Dev Pipes Logo" src={Logo} />
       <div className="br-header">
         <div className="br-header-logo-panel">
         </div>
         <div className="br-header-title-panel">
-          Dev Pipes
+          <img className="br-header-logo" alt="Dev Pipes Logo" src={Logo} />
         </div>
         <div className="br-header-controls-panel">
           <div className="br-header-controls">
@@ -48,7 +48,10 @@ function App() {
         </div>
       </div>
       <div className="br-content">
-        A project manager manager app with automatic payment flows.
+        <div className="br-front-page">
+          A project manager app with automatic payment flows.
+          <img className="br-infographic" alt="Dev Pipes Infographic" src={Infographic} />
+        </div>
       </div>
     </div>
   );

@@ -55,6 +55,12 @@
     position: relative;
 }
 
+.br-front-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .br-intro-panel {
     border: 1px solid black;
     border-radius: $spacing-sm;
@@ -531,4 +537,8 @@
 
 .br-invisible {
     opacity: 0;
+}
+
+.br-infographic {
+    width: 400px;
 }
