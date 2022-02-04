@@ -69,7 +69,65 @@ describe("DevPipes contract", function () {
 
       let projects = await hardhatDevPipes.getProjectsForUser(addr1.address);
       expect(projects.length).to.equal(1);
+      expect(projects[0].payment).to.equal(oneEth.toString());
     });
+
+    it("Should add royalties", async function () {
+      let dueDate = Math.floor(Date.now() / 1000);
+      let payment = 10n;
+      let oneEth = payment**18n;
+      let pointOneEth = payment**17n;
+
+      await hardhatDevPipes.connect(addr1).createProject(
+        "DevPipes", "Creating the Dev Pipes DApp", "https://ipfs.io/ipfs/bafkreicr6p5fvmewvwzrmkanwcuc6a4cn4gjjacbhhblriigarhzemvfze",
+        dueDate, oneEth.toString(), 
+      );
+
+      await hardhatDevPipes.connect(addr1).addRoyalty(0, addr1.address, pointOneEth);
+
+      let royalties = await hardhatDevPipes.getRoyaltiesTotal(0);
+      expect(royalties).to.equal(pointOneEth);
+    });
+
+    it("Should not allow others to add royalties", async function () {
+      let dueDate = Math.floor(Date.now() / 1000);
+      let payment = 10n;
+      let oneEth = payment**18n;
+      let pointOneEth = payment**17n;
+
+      await hardhatDevPipes.connect(addr1).createProject(
+        "DevPipes", "Creating the Dev Pipes DApp", "https://ipfs.io/ipfs/bafkreicr6p5fvmewvwzrmkanwcuc6a4cn4gjjacbhhblriigarhzemvfze",
+        dueDate, oneEth.toString(), 
+      );
+
+      await 
+      expect(hardhatDevPipes.connect(addr2).addRoyalty(0, addr1.address, pointOneEth))
+      .to.be.revertedWith('error_only_project_creator_can_edit');
+    });
+
+    it("Should be publishable", async function () {
+      let dueDate = Math.floor(Date.now() / 1000);
+      let payment = 10n;
+      let oneEth = payment**18n;
+      let pointOneEth = payment**17n;
+
+      let connAddr1 = hardhatDevPipes.connect(addr1);
+
+      await connAddr1.createProject(
+        "DevPipes", "Creating the Dev Pipes DApp", "https://ipfs.io/ipfs/bafkreicr6p5fvmewvwzrmkanwcuc6a4cn4gjjacbhhblriigarhzemvfze",
+        dueDate, oneEth.toString(), 
+      );
+
+      await connAddr1.publish(0);
+
+      await 
+      expect(connAddr1.addRoyalty(0, addr1.address, pointOneEth))
+      .to.be.revertedWith('error_project_cannot_be_modified_after_publication');
+
+    });
+
+
+
   });
 
   /*

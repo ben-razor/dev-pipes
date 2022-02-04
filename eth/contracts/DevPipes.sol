@@ -11,12 +11,11 @@ contract DevPipes {
     string public name = "Dev Pipes";
     string public symbol = "PIPES";
     uint256 public balance = 0;
-    uint256 internal numProjects = 1;
+    uint256 internal numProjects = 0;
 
     struct Payment {
         address user;
         uint256 amount;
-        Project parent;
     }
 
     struct Project {
@@ -28,6 +27,7 @@ contract DevPipes {
         string uri;
         uint256 dueDate;
         uint256 payment;
+        bool published;
     }
 
     struct Application {
@@ -54,11 +54,44 @@ contract DevPipes {
                            uint256 dueDate, uint256 payment) public {
 
         Project memory project = Project(
-            numProjects, 0, msg.sender, projectName, description, uri, dueDate, payment
+            numProjects, 0, msg.sender, projectName, description, uri, dueDate, payment, false
         );
 
         projects.push(project);
         userProjects[msg.sender].push(project);
+
+        numProjects++;
+    }
+
+    function addRoyalty(uint256 projectId, address user, uint256 amount) public {
+        Project memory proj = projects[projectId];
+
+        require(proj.creator == msg.sender, "error_only_project_creator_can_edit");
+        require(!proj.published, "error_project_cannot_be_modified_after_publication");
+
+        uint256 total = this.getRoyaltiesTotal(projectId);
+
+        require(total + amount <= proj.payment, "error_royalties_exceed_total_available");
+
+        Payment memory payment = Payment(user, amount);
+
+        royalties[projectId].push(payment);
+    }
+
+    function publish(uint256 projectId) public {
+        Project storage proj = projects[projectId];
+        require(proj.creator == msg.sender, "error_only_project_creator_can_edit");
+        proj.published = true;
+    } 
+
+    function getRoyaltiesTotal(uint256 projectId) public view returns(uint256) {
+        uint256 total = 0;
+
+        for(uint256 i = 0; i < royalties[projectId].length; i++) {
+            total += royalties[projectId][i].amount;
+        }
+
+        return total;
     }
 
     function getProjectsForUser(address user) external view returns(Project[] memory) {
