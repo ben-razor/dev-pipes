@@ -42,7 +42,9 @@ function App() {
   const [ contract, setContract ] = useState();
   const [ contractAddress, setContractAddress ] = useState();
   const [ isSignedIn, setIsSignedIn ] = useState();
-  const [ projects, setProjects ] = useState([]);
+  const [ allProjects, setAllProjects ] = useState([]);
+  const [ ownProjects, setOwnProjects ] = useState([]);
+  const [ searchedProjects, setSearchedProjects ] = useState([]);
   const [ activeProject, setActiveProject ] = useState({});
   const [ page, setPage ] = useState('projects');
 
@@ -141,10 +143,27 @@ function App() {
     if(contractChanged) {
       (async () => {
         let _projects = await contract.getProjectsForUser(accounts[0]);
-        setProjects(_projects);
+        setAllProjects(_projects);
       })();
     }
   }, [contractAddress, contract]);
+
+  useEffect(() => {
+    let _ownProjects = [];
+    let _searchedProjects = [];
+    if(allProjects.length) {
+      for(let proj of allProjects) {
+        if(sameAccount(proj.creator, accounts[0])) {
+          _ownProjects.push(proj);
+        }
+        else {
+          _searchedProjects.push(proj);
+        }
+      }
+      setOwnProjects(_ownProjects);
+      setSearchedProjects(_searchedProjects);
+    }
+  }, [allProjects, accounts]);
 
   function signIn() {
     if(!isSignedIn) {
@@ -194,7 +213,7 @@ function App() {
         console.log('tx', tx);
 
         let _projects = await contract.getProjectsForUser(accounts[0]);
-        setProjects(_projects);
+        setAllProjects(_projects);
 
         provider.once(tx.hash, function(tx) {
           console.log('tx complete ', tx);
@@ -202,7 +221,7 @@ function App() {
 
           (async () => {
             let _projects = await contract.getProjectsForUser(accounts[0]);
-            setProjects(_projects);
+            setAllProjects(_projects);
           })();
         })
 
@@ -329,7 +348,7 @@ function App() {
 
   function selectProject(id) {
     let _activeProject = {};
-    for(let proj of projects) {
+    for(let proj of allProjects) {
       let projID = proj[0].toString();
       if(projID === id) {
         _activeProject = proj;
@@ -361,7 +380,46 @@ function App() {
     return rows;
   }
 
-  function getProjectsPage() {
+  function getSearchPage(projects) {
+    let ui;
+
+    ui = <div>
+      <div className="br-page-panels">
+        <div className="br-page-panel">
+          <div> 
+            { projects.length ? 
+              <div className="br-projects-list">
+                { getProjectsList(projects) }
+              </div>  
+              :
+              getText('text_no_project_results')
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    return <div className="br-profile-page">
+      {ui}
+    </div>
+  }
+
+  function getTasksPage() {
+    let ui;
+
+    ui = <div className="br-page-panel">
+      You are not assigned to any tasks.
+      <br />
+      <br />
+      Use the Search panel to view projects to apply for.
+    </div>
+
+    return <div className="br-tasks-page">
+      {ui}
+    </div>
+  }
+
+  function getProjectsPage(projects) {
     let ui;
 
     ui = <div>
@@ -374,9 +432,7 @@ function App() {
                 { getProjectsList(projects) }
               </div>  
               :
-              <div className="br-info-message">
-                {getText('text_project_none')}
-              </div>
+              getText('text_project_none')
             }
           </div>
         </div>
@@ -455,13 +511,24 @@ function App() {
   }
 
   function getMainPages() {
+    let mainPageUI;
+    if(page === 'projects') {
+      mainPageUI = getProjectsPage(ownProjects);
+    }
+    else if(page === 'tasks') {
+      mainPageUI = getTasksPage();
+    }
+    else if(page === 'search') {
+      mainPageUI = getSearchPage(searchedProjects);
+    }
+
     return <div class="br-pages">
       { activeProject?.id ?
         getActiveProjectPage(activeProject)
         :
         <Fragment>
           {getPageHeadings()}
-          {getProjectsPage()}
+          {mainPageUI}
         </Fragment>
       }
     </div>

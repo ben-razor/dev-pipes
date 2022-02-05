@@ -26,7 +26,7 @@ contract DevPipes {
         string description;
         string uri;
         uint256 dueDate;
-        uint256 payment;
+        uint256 budget;
         bool published;
     }
 
