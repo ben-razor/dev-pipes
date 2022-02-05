@@ -17,6 +17,10 @@ module.exports = {
     rinkeby: {
       url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
       accounts: [`${process.env.ACCOUNT}`]
+    },
+    polygon: {
+      url: `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
+      accounts: [`${process.env.ACCOUNT}`]
     }
   },
   etherscan: {

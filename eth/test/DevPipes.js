@@ -69,7 +69,7 @@ describe("DevPipes contract", function () {
 
       let projects = await hardhatDevPipes.getProjectsForUser(addr1.address);
       expect(projects.length).to.equal(1);
-      expect(projects[0].payment).to.equal(oneEth.toString());
+      expect(projects[0].budget).to.equal(oneEth.toString());
     });
 
     it("Should add royalties", async function () {

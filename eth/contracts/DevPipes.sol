@@ -51,10 +51,10 @@ contract DevPipes {
     }
 
     function createProject(string memory projectName, string memory description, string memory uri, 
-                           uint256 dueDate, uint256 payment) public {
+                           uint256 dueDate, uint256 budget) public {
 
         Project memory project = Project(
-            numProjects, 0, msg.sender, projectName, description, uri, dueDate, payment, false
+            numProjects, 0, msg.sender, projectName, description, uri, dueDate, budget, false
         );
 
         projects.push(project);
@@ -71,7 +71,7 @@ contract DevPipes {
 
         uint256 total = this.getRoyaltiesTotal(projectId);
 
-        require(total + amount <= proj.payment, "error_royalties_exceed_total_available");
+        require(total + amount <= proj.budget, "error_royalties_exceed_total_available");
 
         Payment memory payment = Payment(user, amount);
 

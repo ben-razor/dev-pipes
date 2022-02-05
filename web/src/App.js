@@ -7,15 +7,11 @@ import BrButton from './js/components/lib/BrButton';
 import getText from './data/world/text';
 import { ethers } from 'ethers';
 import devPipesContract from './data/contract/DevPipes';
+import chainConfig, { chainIdToAddress, getAbi } from './data/chainConfig';
 import { StateCheck } from './js/helpers/helpers';
 const stateCheck = new StateCheck();
 
 const TOAST_TIMEOUT = 4000;
-
-let networkConfig = {
-  contractAddress: '0xb671A76Fe1Ee4E8535d827AdD0b260Ab71A124a9',
-  abi: devPipesContract.abi
-};
 
 function App() {
 
@@ -35,7 +31,7 @@ function App() {
   }, [toast]);
 
   const [ accounts, setAccounts ] = useState([]);
-  const [ network, setNetwork ] = useState({});
+  const [ networkConfig, setNetworkConfig ] = useState({});
   const [ networkId, setNetworkId ] = useState();
   const [ provider, setProvider ] = useState();
   const [ signer, setSigner ] = useState();
@@ -100,6 +96,11 @@ function App() {
         console.log('Network Matic Mumbai');
       }
 
+      setNetworkConfig({
+        contractAddress: chainIdToAddress('devPipes', networkId),
+        abi: getAbi('devPipes')
+      })
+      
       connectEthereum();
     }
   }, [networkId, connectEthereum]);
@@ -135,7 +136,7 @@ function App() {
         setContractAddress(contract.address);
       }
     }
-  }, [isSignedIn, networkId, signer]);
+  }, [isSignedIn, networkId, signer, networkConfig]);
 
   useEffect(() => {
     let contractChanged = stateCheck.changed('contractAddress1', contractAddress);

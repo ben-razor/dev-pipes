@@ -1,4 +1,4 @@
-[
+let chains = [
     {
       "name": "Ethereum Mainnet",
       "chainId": 1,
@@ -1559,4 +1559,6 @@
       "faucets": [],
       "infoURL": "https://testnet.wanscan.org"
     }
-  ]
+  ];
+
+export default chains;
