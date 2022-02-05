@@ -12,6 +12,7 @@ const text = {
     "text_project_none": `You have no projects`,
     "text_no_project_results": `No published projects found`,
     "success_image_upload": `Image uploaded`,
+    "error_no_ethereum": `No wallet detected. Try Metamask!`,
     "error_project_created": 'Error creating project',
     "error_invalid_network": `Network is not supported`,
     "error_image_upload_failed": `Image upload failed`

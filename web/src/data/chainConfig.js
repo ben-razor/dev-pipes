@@ -1,19 +1,15 @@
 import chains from './chains';
 import devPipesContract from './contract/DevPipes';
 
-const validNetworks = [4, 0x89];
+const validNetworks = [3, 0x89];
 
 const chainConfig = {
   contracts: {
     'devPipes': {
       abi: devPipesContract.abi,
       address: {
-        'rin': {
-          address: '0xb671A76Fe1Ee4E8535d827AdD0b260Ab71A124a9'
-        },
-        'matic': {
-          address: '0x742a63530FC9982218490cda497B3F27dF836b51'
-        }
+        'rop': '0xb671A76Fe1Ee4E8535d827AdD0b260Ab71A124a9',
+        'matic': '0x742a63530FC9982218490cda497B3F27dF836b51'
       }
     }
   }

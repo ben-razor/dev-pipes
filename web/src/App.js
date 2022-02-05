@@ -46,40 +46,52 @@ function App() {
   const [ searchedProjects, setSearchedProjects ] = useState([]);
   const [ activeProject, setActiveProject ] = useState({});
   const [ page, setPage ] = useState('projects');
+  const [ error, setError ] = useState();
 
   const connectEthereum = useCallback(() => {
     (async () => {
-      console.log('conn eth')
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
-      let accounts = await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
-      console.log('Eth connected', accounts);
-      setAccounts(accounts);
-      setProvider(provider);
-      setSigner(signer);
-      const network = await provider.getNetwork();
-      setNetworkId(parseInt(network.chainId));
+      if(window.ethereum) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        let accounts = await provider.send("eth_requestAccounts", []);
+        const signer = provider.getSigner();
+        console.log('Eth connected', accounts);
+        setAccounts(accounts);
+        setProvider(provider);
+        setSigner(signer);
+        const network = await provider.getNetwork();
+        const networkId = parseInt(network.chainId);
+        setNetworkId(networkId);
+        setNetworkConfig({
+          contractAddress: chainIdToAddress('devPipes', networkId),
+          abi: getAbi('devPipes')
+        })
 
-      window.ethereum.removeAllListeners("chainChanged");
-      window.ethereum.removeAllListeners("accountsChanged");
+        window.ethereum.removeAllListeners("chainChanged");
+        window.ethereum.removeAllListeners("accountsChanged");
 
-      window.ethereum.on("chainChanged", async(x) => {
-        console.log('new net', x);
-        setNetworkId(parseInt(x));
-      });
+        window.ethereum.on("chainChanged", async(x) => {
+          console.log('new net', x);
+          setNetworkId(parseInt(x));
+        });
 
-      window.ethereum.on("accountsChanged", async(x) => {
-        console.log('new accounts ', x);
-        setAccounts(x);
-      });
+        window.ethereum.on("accountsChanged", async(x) => {
+          console.log('new accounts ', x);
+          setAccounts(x);
+        });
 
-      setIsSignedIn(true);
+        setIsSignedIn(true);
+      }
+      else {
+        setError('error_no_ethereum');
+      }
     })();
   }, []);
 
+  /*
   useEffect(() => {
     connectEthereum();
   }, [connectEthereum]);
+  */
 
   useEffect(() => {
     let networkChanged = stateCheck.changed('netChanged1', networkId);
@@ -99,11 +111,6 @@ function App() {
         console.log('Network Matic Mumbai');
       }
 
-      setNetworkConfig({
-        contractAddress: chainIdToAddress('devPipes', networkId),
-        abi: getAbi('devPipes')
-      })
-      
       connectEthereum();
     }
   }, [networkId, connectEthereum]);
@@ -131,12 +138,20 @@ function App() {
   }, [accounts, provider, networkId]);
 
   useEffect(() => {
-    if(isSignedIn && validNetwork(networkId)) {
-      let contract = new ethers.Contract(networkConfig.contractAddress, networkConfig.abi, signer);
-      if(contract) {
-        console.log('contract', contract);
-        setContract(contract);
-        setContractAddress(contract.address);
+    let networkChanged = stateCheck.changed('networkConfigContract', networkConfig);
+    if(networkChanged && isSignedIn && validNetwork(networkId)) {
+      try {
+        console.log('pre contract');
+        let contract = new ethers.Contract(networkConfig.contractAddress, networkConfig.abi, signer);
+        console.log('post contract');
+        if(contract) {
+          console.log('contract', contract);
+          setContract(contract);
+          setContractAddress(contract.address);
+        }
+      }
+      catch(e) {
+        console.log('Error loading contract', e);
       }
     }
   }, [isSignedIn, networkId, signer, networkConfig]);
@@ -146,11 +161,17 @@ function App() {
     
     if(contractChanged) {
       (async () => {
-        let _projects = await contract.getProjectsForUser(accounts[0]);
-        setAllProjects(_projects);
+        try {
+          let _projects = await contract.getProjectsForUser(accounts[0]);
+          console.log('success projects', _projects);
+          setAllProjects(_projects);
+        }
+        catch(e) {
+          console.log('Error getting projects: ', accounts[0], e);
+        }
       })();
     }
-  }, [contractAddress, contract]);
+  }, [contractAddress, networkConfig, contract, accounts]);
 
   useEffect(() => {
     let _ownProjects = [];
@@ -166,6 +187,10 @@ function App() {
       }
       setOwnProjects(_ownProjects);
       setSearchedProjects(_searchedProjects);
+    }
+    else {
+      setOwnProjects([]);
+      setSearchedProjects([]);
     }
   }, [allProjects, accounts]);
 
@@ -538,6 +563,8 @@ function App() {
     </div>
   }
 
+  console.log('error', error);
+
   return (
     <div className="br-page">
       <div className="br-header">
@@ -562,6 +589,7 @@ function App() {
           :
           <div className="br-front-page">
             Decentralized project management with automatic payment flows.
+            {error ? <div className="br-info-message">{ getText(error) }</div> : ''}
             <div className="br-sign-in-panel">
               { !isSignedIn ? 
                 <Fragment>
@@ -569,10 +597,12 @@ function App() {
                   <BrButton label={ isSignedIn  ? "Sign out" : "Sign in with Unstoppable Domains"} id="signIn" className="br-button br-icon-button" onClick={signInUnstoppable} />
                 </Fragment>
                 :
-                !validNetwork(networkId) ?
-                  <div className="br-info-message">{getText('text_network_info')}</div>
-                  :
-                  ''
+                (
+                  !validNetwork(networkId) ?
+                    <div className="br-info-message">{getText('text_network_info')}</div>
+                    :
+                    ''
+                )
               }
             </div>
             <img className="br-infographic" alt="Dev Pipes Infographic" src={Infographic} />

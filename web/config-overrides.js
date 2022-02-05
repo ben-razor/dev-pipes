@@ -1,4 +1,6 @@
 const webpack = require('webpack');
+const dotEnv = require('dotenv-webpack')
+
 module.exports = function override(config, env) {
     config.module.rules = config.module.rules.concat(
         [
@@ -20,7 +22,9 @@ module.exports = function override(config, env) {
     );
     config.resolve.fallback = {
         buffer: require.resolve('buffer'),
-        stream: require.resolve('stream-browserify')
+        stream: require.resolve('stream-browserify'),
+        path: require.resolve('path-browserify'),
+        os: require.resolve('os-browserify')
     };
     config.plugins.push(
         new webpack.ProvidePlugin({
@@ -28,6 +32,7 @@ module.exports = function override(config, env) {
             Buffer: ['buffer', 'Buffer'],
         }),
     );
+    config.plugins.push(new dotEnv())
 
     return config;
 }
