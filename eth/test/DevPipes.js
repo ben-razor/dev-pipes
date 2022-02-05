@@ -57,14 +57,14 @@ describe("DevPipes contract", function () {
   });
 
   describe('Projects', function() {
-    it("Should transfer create projects", async function () {
+    it("Should create projects", async function () {
       let dueDate = Math.floor(Date.now() / 1000);
       let payment = 10n;
       let oneEth = payment**18n;
 
       await hardhatDevPipes.connect(addr1).createProject(
         "DevPipes", "Creating the Dev Pipes DApp", "https://ipfs.io/ipfs/bafkreicr6p5fvmewvwzrmkanwcuc6a4cn4gjjacbhhblriigarhzemvfze",
-        dueDate, oneEth.toString(), 
+        "", dueDate, oneEth.toString(), 
       );
 
       let projects = await hardhatDevPipes.getProjectsForUser(addr1.address);
@@ -80,7 +80,7 @@ describe("DevPipes contract", function () {
 
       await hardhatDevPipes.connect(addr1).createProject(
         "DevPipes", "Creating the Dev Pipes DApp", "https://ipfs.io/ipfs/bafkreicr6p5fvmewvwzrmkanwcuc6a4cn4gjjacbhhblriigarhzemvfze",
-        dueDate, oneEth.toString(), 
+        "", dueDate, oneEth.toString(), 
       );
 
       await hardhatDevPipes.connect(addr1).addRoyalty(0, addr1.address, pointOneEth);
@@ -97,7 +97,7 @@ describe("DevPipes contract", function () {
 
       await hardhatDevPipes.connect(addr1).createProject(
         "DevPipes", "Creating the Dev Pipes DApp", "https://ipfs.io/ipfs/bafkreicr6p5fvmewvwzrmkanwcuc6a4cn4gjjacbhhblriigarhzemvfze",
-        dueDate, oneEth.toString(), 
+        "", dueDate, oneEth.toString(), 
       );
 
       await 
@@ -115,14 +115,11 @@ describe("DevPipes contract", function () {
 
       await connAddr1.createProject(
         "DevPipes", "Creating the Dev Pipes DApp", "https://ipfs.io/ipfs/bafkreicr6p5fvmewvwzrmkanwcuc6a4cn4gjjacbhhblriigarhzemvfze",
-        dueDate, oneEth.toString(), 
+        "", dueDate, oneEth.toString(), 
       );
 
       await connAddr1.publish(0);
 
-      await 
-      expect(connAddr1.addRoyalty(0, addr1.address, pointOneEth))
-      .to.be.revertedWith('error_project_cannot_be_modified_after_publication');
     });
 
   });

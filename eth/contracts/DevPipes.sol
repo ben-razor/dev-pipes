@@ -11,38 +11,51 @@ contract DevPipes {
     string public name = "Dev Pipes";
     string public symbol = "PIPES";
     uint256 public balance = 0;
-    uint256 internal numProjects = 0;
+    uint256 public numProjects = 0;
+    uint256 public numSubProjects = 0;
+    uint256 public numApplications = 0;
+    uint256 public numPayments = 0;
 
     struct Payment {
+        uint256 id;
         address user;
         uint256 amount;
+        uint8 status;
     }
 
     struct Project {
         uint256 id;
-        uint256 parentID;
+        uint256 parentId;
         address creator;
         string name;
         string description;
         string uri;
+        string tags;
         uint256 dueDate;
         uint256 budget;
-        bool published;
+        uint8 status;
     }
 
     struct Application {
+        uint256 id;
         address applicant;
-        int256 projectID;
+        uint256 projectID;
+        string details1;
+        string details2;
         bool accepted;
+        uint8 status;
     }
 
     // An address type variable is used to store ethereum accounts.
     address public owner;
 
     Project[] projects;
+    Application[] applications;
+    Payment[] royalties;
     mapping(address => Project[]) userProjects;
-    mapping(uint256 => Payment[]) royalties;
     mapping(uint256 => Project[]) subProjects;
+    mapping(uint256 => Payment[]) projectRoyalties;
+    mapping(uint256 => Application[]) projectApplications;
 
     constructor() {
         // The totalSupply is assigned to transaction sender, which is the account
@@ -51,10 +64,10 @@ contract DevPipes {
     }
 
     function createProject(string memory projectName, string memory description, string memory uri, 
-                           uint256 dueDate, uint256 budget) public {
+                           string memory tags, uint256 dueDate, uint256 budget) public {
 
         Project memory project = Project(
-            numProjects, 0, msg.sender, projectName, description, uri, dueDate, budget, false
+            numProjects, 0, msg.sender, projectName, description, uri, tags, dueDate, budget, 0 
         );
 
         projects.push(project);
@@ -63,32 +76,70 @@ contract DevPipes {
         numProjects++;
     }
 
+    function createSubProject(uint256 parentId, string memory projectName, string memory description, string memory uri, 
+                              string memory tags, uint256 dueDate, uint256 budget) public {
+
+        Project memory project = Project(
+            numProjects, parentId, msg.sender, projectName, description, uri, tags, dueDate, budget, 0
+        );
+
+        projects.push(project);
+        subProjects[parentId].push(project);
+        userProjects[msg.sender].push(project);
+
+        numProjects++;
+    }
+
+    function applyForProject(address applicant, uint256 projectId, string memory details1, string memory details2) public {
+        require(projectId <= numProjects, "error_project_does_not_exist");
+        Project memory details = projects[projectId];
+        uint256 blockTS = block.timestamp * 1000;
+        require(blockTS < details.dueDate, "error_project_expired");
+        require(details.status > 0, "");
+
+        Application memory application = Application(
+            numApplications, applicant, projectId, details1, details2, false, 0
+        );
+
+        applications.push(application);
+        projectApplications[projectId].push(application);
+        numApplications++;
+    }
+
+    function withdrawApplication(uint256 applicationId) public {
+        Application storage application = applications[applicationId];
+        require(application.applicant == msg.sender, "error_only_application_creator_can_edit");
+        application.status = 1;
+    }
+
     function addRoyalty(uint256 projectId, address user, uint256 amount) public {
         Project memory proj = projects[projectId];
 
         require(proj.creator == msg.sender, "error_only_project_creator_can_edit");
-        require(!proj.published, "error_project_cannot_be_modified_after_publication");
 
         uint256 total = this.getRoyaltiesTotal(projectId);
 
         require(total + amount <= proj.budget, "error_royalties_exceed_total_available");
 
-        Payment memory payment = Payment(user, amount);
+        Payment memory payment = Payment(numPayments, user, amount, 0);
 
-        royalties[projectId].push(payment);
+        royalties.push(payment);
+        projectRoyalties[projectId].push(payment);
+
+        numPayments++;
     }
 
     function publish(uint256 projectId) public {
         Project storage proj = projects[projectId];
         require(proj.creator == msg.sender, "error_only_project_creator_can_edit");
-        proj.published = true;
+        proj.status = 1;
     } 
 
     function getRoyaltiesTotal(uint256 projectId) public view returns(uint256) {
         uint256 total = 0;
 
-        for(uint256 i = 0; i < royalties[projectId].length; i++) {
-            total += royalties[projectId][i].amount;
+        for(uint256 i = 0; i < projectRoyalties[projectId].length; i++) {
+            total += projectRoyalties[projectId][i].amount;
         }
 
         return total;
