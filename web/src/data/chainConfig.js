@@ -1,7 +1,9 @@
 import chains from './chains';
 import devPipesContract from './contract/DevPipes';
 
-let chainConfig = {
+const validNetworks = [4, 0x89];
+
+const chainConfig = {
   contracts: {
     'devPipes': {
       abi: devPipesContract.abi,
@@ -25,7 +27,8 @@ export function chainIdToField(chainId, field) {
   if(!(chainId in chainCacheById)) {
     for(let chain of chains) {
       if(chain.chainId === chainId) {
-        chainCacheById[chainId] = chain[chainId];
+        chainCacheById[chainId] = chain;
+        break;
       }
     }
   }
@@ -38,8 +41,13 @@ export function getAbi(contractId) {
 }
 
 export function chainIdToAddress(contractId, chainId) {
-  let chainShortName = chainIdToField(chainId);
+  let chainShortName = chainIdToField(chainId, 'shortName');
   return chainConfig.contracts[contractId].address[chainShortName]
 }
 
-module.exports = chainConfig;
+export function validNetwork(networkId) {
+  let nid = parseInt(networkId);
+  return validNetworks.includes(nid);
+}
+
+export default chainConfig;

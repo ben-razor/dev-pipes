@@ -7,7 +7,7 @@ import BrButton from './js/components/lib/BrButton';
 import getText from './data/world/text';
 import { ethers } from 'ethers';
 import devPipesContract from './data/contract/DevPipes';
-import chainConfig, { chainIdToAddress, getAbi } from './data/chainConfig';
+import chainConfig, { chainIdToAddress, getAbi, validNetwork } from './data/chainConfig';
 import { StateCheck } from './js/helpers/helpers';
 const stateCheck = new StateCheck();
 
@@ -31,7 +31,10 @@ function App() {
   }, [toast]);
 
   const [ accounts, setAccounts ] = useState([]);
-  const [ networkConfig, setNetworkConfig ] = useState({});
+  const [ networkConfig, setNetworkConfig ] = useState({
+    contractAddress: chainIdToAddress('devPipes', 3),
+    abi: getAbi('devPipes')
+  });
   const [ networkId, setNetworkId ] = useState();
   const [ provider, setProvider ] = useState();
   const [ signer, setSigner ] = useState();
@@ -523,7 +526,7 @@ function App() {
       mainPageUI = getSearchPage(searchedProjects);
     }
 
-    return <div class="br-pages">
+    return <div className="br-pages">
       { activeProject?.id ?
         getActiveProjectPage(activeProject)
         :
@@ -533,10 +536,6 @@ function App() {
         </Fragment>
       }
     </div>
-  }
-
-  function validNetwork(networkId) {
-    return parseInt(networkId) === 3;
   }
 
   return (
