@@ -6,7 +6,7 @@ const text_consts = {
 
 const text = {
   "en": {
-    "text_network_info": `Please set network to Polygon or Ropsten`,  
+    "text_network_info": `Please set network to Polygon`,  
     "text_project_created": `Project created`,
     "text_project_updated": `Project updated`,
     "text_project_creating": `Creating project on blockchain...`,

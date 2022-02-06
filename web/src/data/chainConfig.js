@@ -1,7 +1,7 @@
 import chains from './chains';
 import devPipesContract from './contract/DevPipes';
 
-const validNetworks = [3, 0x89];
+const validNetworks = [0x89];
 
 const chainConfig = {
   contracts: {
