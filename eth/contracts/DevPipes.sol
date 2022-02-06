@@ -8,13 +8,13 @@ pragma solidity ^0.8.0;
 contract DevPipes {
     // Some string type variables to identify the token.
     // The `public` modifier makes a variable readable from outside the contract.
-    string public name = "Dev Pipes";
-    string public symbol = "PIPES";
-    uint256 public balance = 0;
-    uint256 public numProjects = 0;
-    uint256 public numSubProjects = 0;
-    uint256 public numApplications = 0;
-    uint256 public numPayments = 0;
+    string public name;
+    string public symbol;
+    uint256 public balance;
+    uint256 public numProjects;
+    uint256 public numSubProjects;
+    uint256 public numApplications;
+    uint256 public numPayments;
 
     struct Payment {
         uint256 id;
@@ -56,11 +56,16 @@ contract DevPipes {
     mapping(uint256 => Project[]) subProjects;
     mapping(uint256 => Payment[]) projectRoyalties;
     mapping(uint256 => Application[]) projectApplications;
-
-    constructor() {
-        // The totalSupply is assigned to transaction sender, which is the account
-        // that is deploying the contract.
+    
+    function init() public {
         owner = msg.sender;
+        name = "Dev Pipes";
+        symbol = "PIPES";
+        balance = 0;
+        numProjects = 0;
+        numSubProjects = 0;
+        numApplications = 0;
+        numPayments = 0;
     }
 
     function createProject(string memory projectName, string memory description, string memory uri, 
