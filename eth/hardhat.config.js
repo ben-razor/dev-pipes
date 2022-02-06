@@ -28,7 +28,7 @@ module.exports = {
   etherscan: {
     apiKey: {
       ropsten: process.env.ETHERSCAN_API_KEY,
-      polygon: process.env.POYGON_API_KEY
+      polygon: process.env.POLYGON_API_KEY
     }
   }
 };

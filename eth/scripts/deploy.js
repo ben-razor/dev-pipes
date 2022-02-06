@@ -14,7 +14,7 @@ let proxyAddress;
 
 if(network === 'polygon') {
   proxyAddress = '0xb671A76Fe1Ee4E8535d827AdD0b260Ab71A124a9';
-  impAddress = '0x3b21Fdbba3380A1A2459BdFab13166117a460E3d';
+  impAddress = '0xfeBcFfC4B20727CB597cAB0820B092e310Ebd45B';
 }
 else if(network === 'ropsten') {
   proxyAddress = '0x8D0676Da7F8A4Ae60f988beD23006f919f044756';
@@ -40,7 +40,8 @@ async function main() {
   }
   else {
     console.log('Upgrading contract');
-    res = await upgrades.upgradeProxy(proxyAddress, DevPipes);
+    instance = await upgrades.upgradeProxy(proxyAddress, DevPipes);
+    res = await instance.deployed();
   }
 
   console.log("Proxy address:", res.address);
