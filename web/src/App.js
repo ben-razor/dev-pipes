@@ -233,6 +233,17 @@ function App() {
     }
   }, [allProjects, accounts, searchEntry]);
 
+  useEffect(() => {
+    if(activeProject.id) {
+      for(let proj of allProjects) {
+        if(proj.id === activeProject.id) {
+          setActiveProject(proj);
+          break;
+        }
+      }
+    }
+  }, [allProjects, activeProject]);
+
   function cleanTags(tagsStr) {
     let tags = tagsStr.split(',').map(x => x.trim().toLowerCase().replace(/[ ]+/, '-'));
     return tags;
@@ -258,7 +269,7 @@ function App() {
     setProjectEntry(_projectEntry);
   }
 
-  function submitProject(e) {
+  function submitProject(e, type='create') {
     (async () => {
       let dueDate = Math.floor(Date.now() / 1000);
       let payment = 10n;
@@ -269,17 +280,33 @@ function App() {
 
       let timeStamp = Math.floor(new Date(projectEntry.dueDate).getTime() / 1000);
       let cleanedTags = cleanTags(projectEntry.tags).join(',');
-
+      let tx;
+      console.log('Submit proj ' + type);
+      
       try {
-        let tx = await contract.createProject(
-          projectEntry.name, 
-          projectEntry.description, 
-          projectEntry.uri,
-          cleanedTags,
-          timeStamp,
-          wei.toString()
-        );
-
+        if(type === 'create') {
+          tx = await contract.createProject(
+            projectEntry.name, 
+            projectEntry.description, 
+            projectEntry.uri,
+            cleanedTags,
+            timeStamp,
+            wei.toString()
+          );
+        }
+        else {
+          console.log('Editing start!!');
+          tx = await contract.editProject(
+            activeProject.id,
+            projectEntry.name, 
+            projectEntry.description, 
+            projectEntry.uri,
+            cleanedTags,
+            timeStamp,
+            wei.toString()
+          );
+          console.log('Editing!!');
+        }
         console.log('tx', tx);
 
         let _projects = await contract.getProjectsForUser(accounts[0]);
@@ -287,7 +314,12 @@ function App() {
 
         provider.once(tx.hash, function(tx) {
           console.log('tx complete ', tx);
-          toast('tx complete ' + JSON.stringify(tx));
+          if(type === 'create') {
+            toast('text_project_created');
+          }
+          else {
+            toast('text_project_updated');
+          }
 
           (async () => {
             let _projects = await contract.getProjectsForUser(accounts[0]);
@@ -296,11 +328,28 @@ function App() {
           })();
         })
 
-        toast(getText('text_project_creating'))
+        if(type === 'create') {
+          toast(getText('text_project_creating'))
+        }
+        else {
+          toast(getText('text_project_updating'))
+        }
       }
       catch(e) {
-        toast(getText('error_project_created'))
-        console.log(e);
+        console.log('EEEE', e);
+        if(e.error && e.error.code === -32603) {
+          toast(getText(e.error.message.replace('execution reverted: ', '')))
+          console.log(e);
+        }
+        else {
+          if(type === 'create') {
+            toast(getText('error_project_created'));
+          }
+          else {
+            toast(getText('error_project_updated'));
+          }
+          console.log(e);
+        }
       }
     })();
 
@@ -372,7 +421,7 @@ function App() {
   function getCreateProjectForm(type='create') {
     return <div className="br-feature-panel">
       <h3>{ type === 'create' ? 'Create New Project' : 'Edit Project' }</h3>
-      <form onSubmit={ e => submitProject(e) }>
+      <form onSubmit={ e => submitProject(e, type) }>
       <div className="br-feature-row">
         <div className="br-feature-label">
           Name
