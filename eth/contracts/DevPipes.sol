@@ -50,14 +50,14 @@ contract DevPipes {
     // An address type variable is used to store ethereum accounts.
     address public owner;
 
-    Project[] projects;
-    mapping(uint256 => uint256[]) subProjects;
+    Project[] public projects;
+    mapping(uint256 => uint256[]) public subProjects;
 
-    Application[] applications;
-    Payment[] royalties;
-    mapping(address => uint256[]) userProjects;
-    mapping(uint256 => uint256[]) projectRoyalties;
-    mapping(uint256 => uint256[]) projectApplications;
+    Application[] public applications;
+    Payment[] public royalties;
+    mapping(address => uint256[]) public userProjects;
+    mapping(uint256 => uint256[]) public projectRoyalties;
+    mapping(uint256 => uint256[]) public projectApplications;
 
     function init() public {
         owner = msg.sender;
@@ -180,6 +180,10 @@ contract DevPipes {
             projectList[i] = projects[projId];
         }
         return projectList;
+    }
+
+    function getProjectIdsForUser(address user) external view returns(uint256[] memory) {
+        return userProjects[user];
     }
     
     function getAllProjects() external view returns(Project[] memory) {

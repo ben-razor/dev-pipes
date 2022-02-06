@@ -1,11 +1,20 @@
+/*
+ * 1. npx hardhat compile
+ * 2. npx hardhat test 
+ * 3. npx hardhat run scripts/deploy.js --network ropsten
+ * 4. Update proxy/impAddress
+ * 5. npx hardhat verify --network ropsten <impAddress>
+ * 6. Copy ABI to code
+ * 7. Set code address to proxy address if not upgrading
+ */
 const { ethers, upgrades } = require("hardhat");
 
 let network = hre.network.name;
 let proxyAddress;
 
 if(network === 'ropsten') {
-  proxyAddress = '0x8E04E2aa04c063b8d102882614FE9a454c4C9436';
-  impAddress = '0x8D4e1e07829bB8387B764d4584daB6E810507AD3';
+  proxyAddress = '0x8D0676Da7F8A4Ae60f988beD23006f919f044756';
+  impAddress = '0x0dc3fCA86dDa13F70C89146664954F199A0AdcbB';
 }
 
 async function main() {
@@ -29,10 +38,6 @@ async function main() {
     console.log('Upgrading contract');
     res = await upgrades.upgradeProxy(proxyAddress, DevPipes);
   }
-
-  console.log("Instance", instance);
-  console.log("Res", res);
-  console.log("initRes", initRes);
 
   console.log("Proxy address:", res.address);
   console.log('Implementation address: ', await upgrades.erc1967.getImplementationAddress(res.address));
