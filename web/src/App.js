@@ -188,7 +188,7 @@ function App() {
   useEffect(() => {
     let _ownProjects = [];
     let _searchedProjects = [];
-    if(allProjects.length) {
+    if(allProjects.length && accounts.length) {
       for(let proj of allProjects) {
         if(sameAccount(proj.creator, accounts[0])) {
           _ownProjects.push(proj);
@@ -415,10 +415,37 @@ function App() {
     setActiveProject(_activeProject);
   }
 
+  function publishProject(projId) {
+    console.log(projId);
+    if(projId && contract) {
+      (async () => {
+        let tx = await contract.publish(projId);
+
+        console.log('tx', tx);
+
+        let _projects = await contract.getProjectsForUser(accounts[0]);
+        setAllProjects(_projects);
+
+        provider.once(tx.hash, function(tx) {
+          console.log('tx complete ', tx);
+          toast('Publish complete');
+
+          (async () => {
+            let _projects = await contract.getProjectsForUser(accounts[0]);
+            setAllProjects(_projects);
+          })();
+        })
+
+        toast(getText('text_project_updating'))
+      })();
+    }
+  }
+
   function getProjectsList(projects) {
     let rows = [];
 
     for(let proj of projects) {
+      console.log(proj);
       let projID = proj.id.toString();
       rows.push(<div className="br-project-row" key={projID}>
         <div className="br-project-heading">
@@ -431,6 +458,13 @@ function App() {
           <div className="br-project-details-right">
             <BrButton type="sumbit" label="Select" id={'selectProject' + projID} key={'submit' + projID}
                       className="br-button br-icon-button" onClick={e => selectProject(projID)}/>
+            <div className="br-separator"></div>
+            {proj.status === 0 ? 
+              <BrButton type="sumbit" label="Publish" id={'publishProject' + projID} key={'publish' + projID}
+                        className="br-button br-icon-button" onClick={e => publishProject(projID)}/>
+              :
+              <div className="">Published</div>
+            }
           </div>
         </div>
       </div>);
@@ -518,7 +552,7 @@ function App() {
       _projectEntry.tags = activeProject.tags;
 
       _projectEntry.dueDate = dateFromBigNumber(activeProject.dueDate).toISOString().substr(0, 16);
-      _projectEntry.budget = ethers.utils.formatEther(activeProject.payment.toString());
+      _projectEntry.budget = ethers.utils.formatEther(activeProject.budget.toString());
       setProjectEntry(_projectEntry);
     }
   }, [activeProject]);
