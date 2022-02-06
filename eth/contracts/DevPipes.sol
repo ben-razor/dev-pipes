@@ -181,4 +181,8 @@ contract DevPipes {
         }
         return projectList;
     }
+    
+    function getAllProjects() external view returns(Project[] memory) {
+        return projects;
+    }
 }

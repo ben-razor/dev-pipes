@@ -4,7 +4,8 @@ let network = hre.network.name;
 let proxyAddress;
 
 if(network === 'ropsten') {
-  // proxyAddress = '0xE11aE662454edcEd8e3B9B2104ebcc84b979b34d';
+  proxyAddress = '0x8E04E2aa04c063b8d102882614FE9a454c4C9436';
+  impAddress = '0x8D4e1e07829bB8387B764d4584daB6E810507AD3';
 }
 
 async function main() {
@@ -32,7 +33,9 @@ async function main() {
   console.log("Instance", instance);
   console.log("Res", res);
   console.log("initRes", initRes);
-  console.log("DevPipes address:", res.address);
+
+  console.log("Proxy address:", res.address);
+  console.log('Implementation address: ', await upgrades.erc1967.getImplementationAddress(res.address));
 }
 
 main()
