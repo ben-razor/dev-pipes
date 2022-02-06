@@ -31,10 +31,7 @@ function App() {
   }, [toast]);
 
   const [ accounts, setAccounts ] = useState([]);
-  const [ networkConfig, setNetworkConfig ] = useState({
-    contractAddress: chainIdToAddress('devPipes', 3),
-    abi: getAbi('devPipes')
-  });
+  const [ networkConfig, setNetworkConfig ] = useState({});
   const [ networkId, setNetworkId ] = useState();
   const [ provider, setProvider ] = useState();
   const [ signer, setSigner ] = useState();
@@ -51,35 +48,49 @@ function App() {
   const connectEthereum = useCallback(() => {
     (async () => {
       if(window.ethereum) {
+        let accounts;
         const provider = new ethers.providers.Web3Provider(window.ethereum)
-        let accounts = await provider.send("eth_requestAccounts", []);
-        const signer = provider.getSigner();
-        console.log('Eth connected', accounts);
-        setAccounts(accounts);
-        setProvider(provider);
-        setSigner(signer);
-        const network = await provider.getNetwork();
-        const networkId = parseInt(network.chainId);
-        setNetworkId(networkId);
-        setNetworkConfig({
-          contractAddress: chainIdToAddress('devPipes', networkId),
-          abi: getAbi('devPipes')
-        })
 
-        window.ethereum.removeAllListeners("chainChanged");
-        window.ethereum.removeAllListeners("accountsChanged");
+        try {
+          accounts = await provider.send("eth_requestAccounts", []);
 
-        window.ethereum.on("chainChanged", async(x) => {
-          console.log('new net', x);
-          setNetworkId(parseInt(x));
-        });
+          const signer = provider.getSigner();
+          console.log('Eth connected', accounts);
+          setAccounts(accounts);
+          setProvider(provider);
+          setSigner(signer);
+          console.log('Pre getNetwork');
+          const network = await provider.getNetwork();
+          const networkId = parseInt(network.chainId);
+          setNetworkId(networkId);
+          setNetworkConfig({
+            contractAddress: chainIdToAddress('devPipes', networkId),
+            abi: getAbi('devPipes')
+          })
+          console.log('Post getNetwork');
 
-        window.ethereum.on("accountsChanged", async(x) => {
-          console.log('new accounts ', x);
-          setAccounts(x);
-        });
+          window.ethereum.removeAllListeners("chainChanged");
+          window.ethereum.removeAllListeners("accountsChanged");
+  
+          window.ethereum.on("chainChanged", async(x) => {
+            console.log('new net', x);
+            setNetworkId(parseInt(x));
+          });
+  
+          window.ethereum.on("accountsChanged", async(x) => {
+            console.log('new accounts ', x);
+            setAccounts(x);
+          });
+  
+          setIsSignedIn(true);
+        }
+        catch(e) {
+          console.log(e);
+          if(e.code === -32002) {
+            doubleToast(getText('error_metamast_accounts_pending'), getText('error_please_check_wallet'));
+          }
+        }
 
-        setIsSignedIn(true);
       }
       else {
         setError('error_no_ethereum');
@@ -138,8 +149,9 @@ function App() {
   }, [accounts, provider, networkId]);
 
   useEffect(() => {
-    let networkChanged = stateCheck.changed('networkConfigContract', networkConfig);
-    if(networkChanged && isSignedIn && validNetwork(networkId)) {
+    let networkChanged = stateCheck.changed('networkConfigContract', networkConfig, {});
+    console.log('Network', networkChanged, networkConfig, validNetwork(networkId), networkId);
+    if(networkChanged && validNetwork(networkId)) {
       try {
         console.log('pre contract');
         let contract = new ethers.Contract(networkConfig.contractAddress, networkConfig.abi, signer);
@@ -154,7 +166,7 @@ function App() {
         console.log('Error loading contract', e);
       }
     }
-  }, [isSignedIn, networkId, signer, networkConfig]);
+  }, [networkId, signer, networkConfig]);
 
   useEffect(() => {
     let contractChanged = stateCheck.changed('contractAddress1', contractAddress);
@@ -210,7 +222,7 @@ function App() {
 
   let todaysDate = new Date().toISOString().substr(0, 16);
   const [ projectEntry, setProjectEntry ] = useState({
-    name: '', description: '', uri: '', dueDate: todaysDate, budget: 0
+    name: '', description: '', uri: '', tags: '', dueDate: todaysDate, budget: 0
   });
 
   function projectFormChanged(e, field) {
@@ -235,6 +247,7 @@ function App() {
           projectEntry.name, 
           projectEntry.description, 
           projectEntry.uri,
+          projectEntry.tags,
           timeStamp,
           wei.toString()
         );
@@ -294,6 +307,14 @@ function App() {
       </div>
       <div className="br-feature-row">
         <div className="br-feature-label">
+          Tags (Comma Separated)
+        </div>
+        <div className="br-feature-control">
+          {project.tags}
+        </div>
+      </div>
+      <div className="br-feature-row">
+        <div className="br-feature-label">
           Due Date
         </div>
         <div className="br-feature-control">
@@ -344,7 +365,15 @@ function App() {
           Media URI
         </div>
         <div className="br-feature-control">
-          <input type="text" minLength="20" required value={projectEntry.uri} onChange={e => projectFormChanged(e, 'uri') } />
+          <input type="text" value={projectEntry.uri} onChange={e => projectFormChanged(e, 'uri') } />
+        </div>
+      </div>
+      <div className="br-feature-row">
+        <div className="br-feature-label">
+          Tags (Comma Separated)
+        </div>
+        <div className="br-feature-control">
+          <input type="text" minLength="5" required value={projectEntry.tags} onChange={e => projectFormChanged(e, 'tags') } />
         </div>
       </div>
       <div className="br-feature-row">
@@ -486,6 +515,7 @@ function App() {
       _projectEntry.name = activeProject.name;
       _projectEntry.description = activeProject.description;
       _projectEntry.uri = activeProject.uri;
+      _projectEntry.tags = activeProject.tags;
 
       _projectEntry.dueDate = dateFromBigNumber(activeProject.dueDate).toISOString().substr(0, 16);
       _projectEntry.budget = ethers.utils.formatEther(activeProject.payment.toString());
@@ -562,8 +592,6 @@ function App() {
       }
     </div>
   }
-
-  console.log('error', error);
 
   return (
     <div className="br-page">

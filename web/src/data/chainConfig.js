@@ -8,7 +8,7 @@ const chainConfig = {
     'devPipes': {
       abi: devPipesContract.abi,
       address: {
-        'rop': '0xb671A76Fe1Ee4E8535d827AdD0b260Ab71A124a9',
+        'rop': '0xE11aE662454edcEd8e3B9B2104ebcc84b979b34d',
         'matic': '0x742a63530FC9982218490cda497B3F27dF836b51'
       }
     }

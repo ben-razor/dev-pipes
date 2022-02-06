@@ -15,7 +15,9 @@ const text = {
     "error_no_ethereum": `No wallet detected. Try Metamask!`,
     "error_project_created": 'Error creating project',
     "error_invalid_network": `Network is not supported`,
-    "error_image_upload_failed": `Image upload failed`
+    "error_image_upload_failed": `Image upload failed`,
+    "error_metamast_accounts_pending": `A connection request is pending`,
+    "error_please_check_wallet": `Please check your Eth Wallet`
   }
 };
 
