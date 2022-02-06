@@ -1,16 +1,25 @@
-import { useState, useEffect, useCallback, Fragment } from 'react';
+import React, { useState, useEffect, useCallback, Fragment } from 'react';
 import web3modal from './js/helpers/web3modal';
 import Logo from './images/dev-pipes-2.png';
 import Infographic from './images/infographic-1.png';
-import './scss/styles.scss';
 import { useToasts } from 'react-toast-notifications';
 import BrButton from './js/components/lib/BrButton';
+import './css/_base.css';
+import './css/_content.css';
 import getText from './data/world/text';
 import { ethers } from 'ethers';
 import devPipesContract from './data/contract/DevPipes';
 import chainConfig, { chainIdToAddress, getAbi, validNetwork } from './data/chainConfig';
 import { StateCheck } from './js/helpers/helpers';
+import UAuth from '@uauth/js'
+
 const stateCheck = new StateCheck();
+
+const uauth = new UAuth({
+  clientID: '2ZatKOp/E4ItUFzBPdwRvD7oh3EhRnCTqIP7rM1MDD8=',
+  clientSecret: 'pylTQFwkDRQHw7fyLrVttnY7x6r8S/IEsjEWmImXq8s=',
+  redirectUri: 'https://dev-pipes.vercel.app/',
+})
 
 const TOAST_TIMEOUT = 4000;
 
@@ -45,6 +54,7 @@ function App() {
   const [ activeProject, setActiveProject ] = useState({});
   const [ page, setPage ] = useState('projects');
   const [ error, setError ] = useState();
+  const [ udInfo, setUDInfo ] = useState({});
 
   let todaysDate = new Date().toISOString().substr(0, 16);
   const [ projectEntry, setProjectEntry ] = useState({
@@ -107,12 +117,6 @@ function App() {
       }
     })();
   }, []);
-
-  /*
-  useEffect(() => {
-    connectEthereum();
-  }, [connectEthereum]);
-  */
 
   useEffect(() => {
     let networkChanged = stateCheck.changed('netChanged1', networkId);
@@ -255,20 +259,25 @@ function App() {
     }
     else {
       setAccounts([]);
+      setUDInfo({});
       setIsSignedIn(false);
     }
   }
 
   function signInUnstoppable() {
-    toast('Log in with Unstoppable Domains is not yet implemented');
     (async () => {
-      const instanceProvider = await web3modal.connect();
+      //const instanceProvider = await web3modal.connect();
 
-      let accounts;
-      const provider = new ethers.providers.Web3Provider(instanceProvider)
+      const instanceProvider = await uauth.loginWithPopup()
+      console.log(instanceProvider);
+      setUDInfo(instanceProvider.idToken);
+      let accounts = [instanceProvider.idToken.wallet_address];
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
 
       try {
-        accounts = await provider.send("eth_requestAccounts", []);
+        if(!accounts.length) {
+          accounts = await provider.send("eth_requestAccounts", []);
+        }
 
         const signer = provider.getSigner();
         console.log('Eth connected', accounts);
@@ -291,7 +300,7 @@ function App() {
         window.ethereum.on("chainChanged", async(x) => {
           console.log('new net', x);
           setNetworkId(parseInt(x));
-        });
+        })
 
         window.ethereum.on("accountsChanged", async(x) => {
           console.log('new accounts ', x);
@@ -318,11 +327,9 @@ function App() {
 
   function submitProject(e, type='create') {
     (async () => {
-      let dueDate = Math.floor(Date.now() / 1000);
-      let payment = 10n;
-      let oneEth = payment**18n;
-
-      let wei = ethers.utils.parseEther(projectEntry.budget);
+      console.log('p1');
+      let wei = ethers.utils.parseEther(projectEntry.budget.toString());
+      console.log('p2');
       console.log('wei', wei);
 
       let timeStamp = Math.floor(new Date(projectEntry.dueDate).getTime() / 1000);
@@ -330,6 +337,7 @@ function App() {
       let tx;
       console.log('Submit proj ' + type);
       
+      console.log('p3');
       try {
         if(type === 'create') {
           tx = await contract.createProject(
@@ -354,6 +362,8 @@ function App() {
           );
           console.log('Editing!!');
         }
+
+        console.log('p4');
         console.log('tx', tx);
 
         let _projects = await contract.getProjectsForUser(accounts[0]);
@@ -789,6 +799,7 @@ function getTasksPage() {
         <div className="br-header-controls-panel">
           { isSignedIn ?
             <Fragment>
+              <div className="br-header-name">{ udInfo.sub ? udInfo.sub : accounts[0]?.substr(0, 28) + '…'}</div>
               <BrButton label={ isSignedIn  ? "Sign out" : "Sign in"} id="signIn" className="br-button br-icon-button" onClick={signIn} />
             </Fragment>
             :
@@ -806,9 +817,9 @@ function getTasksPage() {
             <div className="br-sign-in-panel">
               { !isSignedIn ? 
                 <Fragment>
-                  <BrButton label={ isSignedIn  ? "Sign out" : "Sign in"} id="signIn" className="br-button br-icon-button" onClick={signIn} />
+                  <button id="signInUnstoppable" className="button-unstoppable" onClick={e => signInUnstoppable() }></button>
                   <div className="br-separator"></div>
-                  <BrButton label={ isSignedIn  ? "Sign out" : "Sign in with Unstoppable Domains"} id="signInUnstoppable" className="br-button br-icon-button" onClick={e => signInUnstoppable() } />
+                  <BrButton label={ isSignedIn  ? "Sign out" : "Sign in with MetaMask"} id="signIn" className="br-button br-icon-button" onClick={signIn} />
                 </Fragment>
                 :
                 (
@@ -829,3 +840,4 @@ function getTasksPage() {
 }
 
 export default App;
+

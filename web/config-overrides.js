@@ -17,7 +17,7 @@ module.exports = function override(config, env) {
                 resolve: {
                   fullySpecified: false,
                 }
-            },
+            }
         ]
     );
     config.resolve.fallback = {

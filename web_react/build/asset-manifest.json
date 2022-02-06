@@ -1,0 +1,24 @@
+{
+  "files": {
+    "main.css": "/static/css/main.9a04c752.chunk.css",
+    "main.js": "/static/js/main.ae492059.chunk.js",
+    "main.js.map": "/static/js/main.ae492059.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.307c0e1c.js",
+    "runtime-main.js.map": "/static/js/runtime-main.307c0e1c.js.map",
+    "static/js/2.f7745ad7.chunk.js": "/static/js/2.f7745ad7.chunk.js",
+    "static/js/2.f7745ad7.chunk.js.map": "/static/js/2.f7745ad7.chunk.js.map",
+    "index.html": "/index.html",
+    "precache-manifest.19a115ae7c5777026e834b9b9b9a96a9.js": "/precache-manifest.19a115ae7c5777026e834b9b9b9a96a9.js",
+    "service-worker.js": "/service-worker.js",
+    "static/css/main.9a04c752.chunk.css.map": "/static/css/main.9a04c752.chunk.css.map",
+    "static/media/_base.css": "/static/media/oily-pawel-czerwinski-RL6635ZURy0-unsplash-edit-1.db155a72.jpg",
+    "static/media/dev-pipes-2.png": "/static/media/dev-pipes-2.127b1fe6.png",
+    "static/media/infographic-1.png": "/static/media/infographic-1.63cbf542.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.307c0e1c.js",
+    "static/js/2.f7745ad7.chunk.js",
+    "static/css/main.9a04c752.chunk.css",
+    "static/js/main.ae492059.chunk.js"
+  ]
+}

@@ -37,9 +37,20 @@
 
 .br-header-controls-panel {
     display: flex;
+    flex-direction: column;
     flex: 1;
-    align-items: center;
-    justify-content: flex-end;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.br-header-name {
+    padding: 0.2em 0.8em;
+    border: 2px solid hsl(200, 50%, 80%);
+    color: hsl(200, 50%, 30%);
+    border-radius: 0.5em;
+    margin-bottom: 5px;
+    max-width: 20em;
+    word-break: break-all;
 }
 
 .br-page {
@@ -50,7 +61,7 @@
     display: flex;
     flex-direction: column;
     margin: auto;
-    padding: $spacing-sm;
+    padding: 0.5em;
     text-align: center;
     position: relative;
 }
@@ -63,8 +74,8 @@
 
 .br-intro-panel {
     border: 1px solid black;
-    border-radius: $spacing-sm;
-    padding: $spacing-md;
+    border-radius: 0.5em;
+    padding: 1em;
     width: 75%;
     margin: auto;
 }
@@ -75,7 +86,7 @@
 }
 
 .br-intro-section {
-    padding: $spacing-sm;
+    padding: 0.5em;
     font-family: NearKartsFancy, monospace;
 }
 
@@ -95,7 +106,7 @@
     padding: 1em;
     width: 50%;
     margin: auto;
-    border: 1px solid $color-1-base;
+    border: 1px solid hsl(200deg, 60%, 30%);
     border-radius: 1em;
 }
 
@@ -109,8 +120,8 @@
     border-radius: 2em;
     justify-content: flex-start;
     align-items: center;
-    margin: $spacing-sm auto;
-    padding: $spacing-sm;
+    margin: 0.5em auto;
+    padding: 0.5em;
 }
 
 .br-nft-title {
@@ -132,15 +143,15 @@
     font-size: 0.9em;
     min-height: 2.5em;
     max-height: 3em;
-    background-image: linear-gradient(0deg, transparent 0%, hsl($color-1-hue, 50%, 30%) 100%);
-    background-color: $color-1-l4;
-    border-color: $color-1-l3;
+    background-image: linear-gradient(0deg, transparent 0%, hsl(200deg, 50%, 30%) 100%);
+    background-color: hsl(200deg,60%, 60%);
+    border-color: hsl(200deg,60%, 50%);
     color: white;
 
     &:disabled {
-        background-image: linear-gradient(0deg, transparent 0%, $color-disabled 100%);
-        background-color: $color-disabled;
-        border-color: $color-disabled-2;
+        background-image: linear-gradient(0deg, transparent 0%, grey 100%);
+        background-color: grey;
+        border-color: darkgrey;
     }
 }
 
@@ -200,7 +211,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: $spacing-sm;
+    padding: 0.5em;
     margin: 0.2em;
     border: 4px solid hsl(0deg, 0%, 70%);
     border-radius: 1em;
@@ -235,7 +246,7 @@
 
 .br-feature-row {
     display: flex;
-    padding: 0.6em $spacing-sm;
+    padding: 0.6em 0.5em;
     justify-items: left;
     align-items: baseline;
 }
@@ -252,7 +263,7 @@
 
 .br-text-entry-row {
     display: flex;
-    padding: 0.8em $spacing-sm;
+    padding: 0.8em 0.5em;
     justify-items: left;
     align-items: center;
 }
@@ -267,13 +278,13 @@
 }
 
 .br-feature-select {
-    background-color: $color-1-base;
+    background-color: hsl(200deg,60%, 30%);
     color: white;
     display: inline-block;
     height: 1.5em;
     vertical-align: middle;
     margin: auto auto auto 0;
-    padding-right: $spacing-sm;
+    padding-right: 0.5em;
     font-size: 1rem;
     border-radius: 0.3em;
     border: 0 solid black;
@@ -292,9 +303,9 @@
 
 .br-nft-gallery {
     border: 1px solid hsl(0deg, 0%, 70%);
-    margin: $spacing-sm;
+    margin: 0.5em;
     border-radius: 1em;
-    padding: $spacing-sm;
+    padding: 0.5em;
     box-sizing: content-box;
     display: flex;
     justify-content: space-between;
@@ -318,8 +329,8 @@
 .br-nft-list-item {
     border: 1px solid hsl(0deg, 0%, 70%);
     border-radius: 1em;
-    padding: $spacing-sm;
-    margin-right: $spacing-sm;
+    padding: 0.5em;
+    margin-right: 0.5em;
     user-select: none;
     cursor: default;
     white-space: pre;
@@ -412,10 +423,10 @@
     display: flex;
     align-items: center;
     flex-direction: column;
-    padding: $spacing-sm;
-    margin: $spacing-sm;
+    padding: 0.5em;
+    margin: 0.5em;
     border: 1px solid hsl(0deg, 0%, 90%);
-    border-radius: $spacing-sm;
+    border-radius: 0.5em;
     width: 200px;
 }
 
@@ -431,10 +442,10 @@
     flex-direction: column;
     flex: 1;
     min-height: 400px;
-    padding: $spacing-sm;
-    margin: $spacing-sm;
+    padding: 0.5em;
+    margin: 0.5em;
     border: 1px solid hsl(0deg, 0%, 90%);
-    border-radius: $spacing-sm;
+    border-radius: 0.5em;
     background-color: hsl(0deg, 0%, 10%);
     color: hsl(300deg, 50%, 60%);
 }
@@ -446,7 +457,7 @@
 .br-battle-viewer-image {
     width: 160px;
     height: 160px;
-    border-radius: $spacing-md;
+    border-radius: 1em;
     border: 2px solid hsla(0deg, 100%, 30%, 0);
 }
 
@@ -459,7 +470,7 @@
 }
 
 .br-battle-text-group {
-    margin-bottom: $spacing-md;
+    margin-bottom: 1em;
 }
 
 .br-battle-text-line-active {
@@ -529,7 +540,7 @@
     border-radius: 1em;
     box-sizing: content-box;
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
     position: relative;
     font-size: 0.8em;
 }
@@ -547,9 +558,9 @@
 }
 
 .br-info-message {
-    border: 2px solid $color-1-l4;
-    padding: $spacing-md;
-    border-radius: $spacing-md;
+    border: 2px solid hsl(200deg,60%, 60%);
+    padding: 1em;
+    border-radius: 1em;
 }
 
 .br-page-panels {
@@ -557,20 +568,20 @@
 }
 
 .br-page-panel {
-    padding: $spacing-sm;
+    padding: 0.5em;
     flex: 1;
-    border: 2px solid $color-1-l4;
-    border-radius: $spacing-md;
-    margin: $spacing-sm;
+    border: 2px solid hsl(200deg,60%, 60%);
+    border-radius: 1em;
+    margin: 0.5em;
 }
 
 .br-project-row {
-    margin-bottom: $spacing-sm;
+    margin-bottom: 0.5em;
 }
 
 .br-page-headings {
     display: flex;
-    border-bottom: 1px solid $color-1-l2;
+    border-bottom: 1px solid hsl(200deg,60%, 40%);
     color: white;
     cursor: default;
     user-select: none;
@@ -586,18 +597,18 @@
 }
 
 .br-page-heading-active {
-    background-color: $color-1-l2;
+    background-color: hsl(200deg,60%, 40%);
 }
 
 .br-project-row {
 }
 
 .br-project-heading {
-    background-color: $color-1-l2;
+    background-color: hsl(200deg,60%, 40%);
     color: white;
     padding: 0.2em 0.5em;
     text-align: left;
-    border-radius: $spacing-sm $spacing-sm 0 0;
+    border-radius: 0.5em 0.5em 0 0;
 }
 
 .br-project-name {
@@ -612,8 +623,8 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    padding: $spacing-sm;
-    border: 1px solid $color-1-l2; 
+    padding: 0.5em;
+    border: 1px solid hsl(200deg,60%, 40%); 
 }
 
 .br-project-details-left {
@@ -626,5 +637,20 @@
 }
 
 .br-separator {
-    height: $spacing-sm;
+    height: 0.5em;
+}
+
+.button-unstoppable {
+    background-image: url(../images/default-button.png);
+    background-size: cover;
+    width: 386px;
+    height: 48px;
+    outline: 0;
+    border: 0;
+}
+.button-unstoppable:hover {
+    background-image: url(../images/hover-button.png);
+}
+.button-unstoppable:active {
+    background-image: url(../images/pressed-button.png);
 }

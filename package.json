@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "os-browserify": "^0.3.0",
-    "path-browserify": "^1.0.1"
-  }
-}
