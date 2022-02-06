@@ -69,6 +69,7 @@ describe("DevPipes contract", function () {
       );
 
       let projects = await hardhatDevPipes.getProjectsForUser(addr1.address);
+      console.log("PROJ", projects);
       expect(projects.length).to.equal(1);
       expect(projects[0].budget).to.equal(oneEth.toString());
     });
@@ -84,9 +85,9 @@ describe("DevPipes contract", function () {
         "", dueDate, oneEth.toString(), 
       );
 
-      await hardhatDevPipes.connect(addr1).addRoyalty(0, addr1.address, pointOneEth);
+      await hardhatDevPipes.connect(addr1).addRoyalty(1, addr1.address, pointOneEth);
 
-      let royalties = await hardhatDevPipes.getRoyaltiesTotal(0);
+      let royalties = await hardhatDevPipes.getRoyaltiesTotal(1);
       expect(royalties).to.equal(pointOneEth);
     });
 
@@ -102,7 +103,7 @@ describe("DevPipes contract", function () {
       );
 
       await 
-      expect(hardhatDevPipes.connect(addr2).addRoyalty(0, addr1.address, pointOneEth))
+      expect(hardhatDevPipes.connect(addr2).addRoyalty(1, addr1.address, pointOneEth))
       .to.be.revertedWith('error_only_project_creator_can_edit');
     });
 
@@ -119,7 +120,7 @@ describe("DevPipes contract", function () {
         "", dueDate, oneEth.toString(), 
       );
 
-      await connAddr1.publish(0);
+      await connAddr1.publish(1);
 
     });
 

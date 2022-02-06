@@ -11,10 +11,10 @@ contract DevPipes {
     string public name;
     string public symbol;
     uint256 public balance;
-    uint256 public numProjects;
-    uint256 public numSubProjects;
-    uint256 public numApplications;
-    uint256 public numPayments;
+
+    uint256 public projectIndex;
+    uint256 public applicationIndex;
+    uint256 public paymentsIndex;
 
     struct Payment {
         uint256 id;
@@ -26,6 +26,7 @@ contract DevPipes {
     struct Project {
         uint256 id;
         uint256 parentId;
+        uint256 rootId;
         address creator;
         string name;
         string description;
@@ -50,65 +51,80 @@ contract DevPipes {
     address public owner;
 
     Project[] projects;
+    mapping(uint256 => uint256[]) subProjects;
+
     Application[] applications;
     Payment[] royalties;
-    mapping(address => Project[]) userProjects;
-    mapping(uint256 => Project[]) subProjects;
-    mapping(uint256 => Payment[]) projectRoyalties;
-    mapping(uint256 => Application[]) projectApplications;
+    mapping(address => uint256[]) userProjects;
+    mapping(uint256 => uint256[]) projectRoyalties;
+    mapping(uint256 => uint256[]) projectApplications;
 
     function init() public {
         owner = msg.sender;
         name = "Dev Pipes";
         symbol = "PIPES";
         balance = 0;
-        numProjects = 0;
-        numSubProjects = 0;
-        numApplications = 0;
-        numPayments = 0;
+        projects.push(Project(0, 0, 0, address(0), "", "", "", "", 0, 0, 0));
+        projectIndex = 1;
+        applications.push(Application(0, address(0), 0, "", "", false, 0));
+        applicationIndex = 1;
+        royalties.push(Payment(0, address(0), 0, 0));
+        paymentsIndex = 1;
     }
 
     function createProject(string memory projectName, string memory description, string memory uri, 
                            string memory tags, uint256 dueDate, uint256 budget) public {
 
         Project memory project = Project(
-            numProjects, 0, msg.sender, projectName, description, uri, tags, dueDate, budget, 0 
+            projectIndex, 0, 0, msg.sender, projectName, description, uri, tags, dueDate, budget, 0 
         );
 
         projects.push(project);
-        userProjects[msg.sender].push(project);
+        userProjects[msg.sender].push(projectIndex);
 
-        numProjects++;
+        projectIndex++;
+    }
+
+    function assertProjectExists(uint256 projectId) internal view {
+        require(projectId <= projectIndex - 1, "error_project_does_not_exist");
     }
 
     function createSubProject(uint256 parentId, string memory projectName, string memory description, string memory uri, 
                               string memory tags, uint256 dueDate, uint256 budget) public {
 
+        assertProjectExists(parentId);
+        Project memory proj = projects[parentId];
+        uint256 rootId = proj.rootId;
+        
+        if(rootId == 0) {
+            rootId = parentId;
+        }
+
         Project memory project = Project(
-            numProjects, parentId, msg.sender, projectName, description, uri, tags, dueDate, budget, 0
+            projectIndex, parentId, rootId, msg.sender, projectName, description, uri, tags, dueDate, budget, 0
         );
 
         projects.push(project);
-        subProjects[parentId].push(project);
-        userProjects[msg.sender].push(project);
+        subProjects[rootId].push(projectIndex);
+        userProjects[msg.sender].push(projectIndex);
 
-        numProjects++;
+        projectIndex++;
     }
 
     function applyForProject(address applicant, uint256 projectId, string memory details1, string memory details2) public {
-        require(projectId <= numProjects, "error_project_does_not_exist");
-        Project memory details = projects[projectId];
+        assertProjectExists((projectId));
+        Project memory proj = projects[projectId];
         uint256 blockTS = block.timestamp * 1000;
-        require(blockTS < details.dueDate, "error_project_expired");
-        require(details.status > 0, "");
+        require(blockTS < proj.dueDate, "error_project_expired");
+        require(proj.status > 0, "");
 
         Application memory application = Application(
-            numApplications, applicant, projectId, details1, details2, false, 0
+            applicationIndex, applicant, projectId, details1, details2, false, 0
         );
 
         applications.push(application);
-        projectApplications[projectId].push(application);
-        numApplications++;
+        projectApplications[projectId].push(applicationIndex);
+        applicationIndex++;
     }
 
     function withdrawApplication(uint256 applicationId) public {
@@ -118,7 +134,7 @@ contract DevPipes {
     }
 
     function addRoyalty(uint256 projectId, address user, uint256 amount) public {
-        require(projectId <= numProjects, "error_project_does_not_exist");
+        assertProjectExists((projectId));
         Project memory proj = projects[projectId];
 
         require(proj.creator == msg.sender, "error_only_project_creator_can_edit");
@@ -127,39 +143,42 @@ contract DevPipes {
 
         require(total + amount <= proj.budget, "error_royalties_exceed_total_available");
 
-        Payment memory payment = Payment(numPayments, user, amount, 0);
+        Payment memory payment = Payment(paymentsIndex, user, amount, 0);
 
         royalties.push(payment);
-        projectRoyalties[projectId].push(payment);
+        projectRoyalties[projectId].push(paymentsIndex);
 
-        numPayments++;
+        paymentsIndex++;
     }
 
     function publish(uint256 projectId) public {
-        require(projectId <= numProjects, "error_project_does_not_exist");
+        assertProjectExists((projectId));
         Project storage proj = projects[projectId];
         require(proj.creator == msg.sender, "error_only_project_creator_can_edit");
         proj.status = 1;
-        for(uint256 i = 0; i < userProjects[msg.sender].length; i++) {
-            Project storage userProject = userProjects[msg.sender][i];
-            if(userProject.id == projectId) {
-                userProject.status = 1;
-                break;
-            }
-        }
     } 
 
     function getRoyaltiesTotal(uint256 projectId) public view returns(uint256) {
+        assertProjectExists(projectId);
         uint256 total = 0;
 
         for(uint256 i = 0; i < projectRoyalties[projectId].length; i++) {
-            total += projectRoyalties[projectId][i].amount;
+            uint256 childId = projectRoyalties[projectId][i];
+            Payment memory royalty = royalties[childId];
+            total += royalty.amount;
         }
 
         return total;
     }
 
     function getProjectsForUser(address user) external view returns(Project[] memory) {
-        return userProjects[user];
+        uint256 numUserProjects = userProjects[user].length;
+        Project[] memory projectList = new Project[](numUserProjects);
+
+        for(uint256 i; i < numUserProjects; i++) {
+            uint256 projId = userProjects[user][i];
+            projectList[i] = projects[projId];
+        }
+        return projectList;
     }
 }
