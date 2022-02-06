@@ -45,6 +45,16 @@ function App() {
   const [ page, setPage ] = useState('projects');
   const [ error, setError ] = useState();
 
+  let todaysDate = new Date().toISOString().substr(0, 16);
+  const [ projectEntry, setProjectEntry ] = useState({
+    name: '', description: '', uri: '', tags: '', dueDate: todaysDate, budget: 0
+  });
+
+  const [ searchEntry, setSearchEntry ] = useState({
+    tags: ''
+  });
+
+
   const connectEthereum = useCallback(() => {
     (async () => {
       if(window.ethereum) {
@@ -176,6 +186,7 @@ function App() {
         try {
           let _projects = await contract.getProjectsForUser(accounts[0]);
           console.log('success projects', _projects);
+
           setAllProjects(_projects);
         }
         catch(e) {
@@ -188,13 +199,29 @@ function App() {
   useEffect(() => {
     let _ownProjects = [];
     let _searchedProjects = [];
+
     if(allProjects.length && accounts.length) {
       for(let proj of allProjects) {
         if(sameAccount(proj.creator, accounts[0])) {
           _ownProjects.push(proj);
         }
-        else {
-          _searchedProjects.push(proj);
+
+        if(proj.status > 0) {
+          let include = true;
+
+          let tags = cleanTags(searchEntry.tags);
+          console.log(tags);
+          if(searchEntry.tags) {
+            for(let tag of tags) {
+              if(!proj.tags.toLowerCase().includes(tag)) {
+                include = false;
+              }
+            }
+          }
+
+          if(include) {
+            _searchedProjects.push(proj);
+          }
         }
       }
       setOwnProjects(_ownProjects);
@@ -204,7 +231,12 @@ function App() {
       setOwnProjects([]);
       setSearchedProjects([]);
     }
-  }, [allProjects, accounts]);
+  }, [allProjects, accounts, searchEntry]);
+
+  function cleanTags(tagsStr) {
+    let tags = tagsStr.split(',').map(x => x.trim().toLowerCase().replace(/[ ]+/, '-'));
+    return tags;
+  }
 
   function signIn() {
     if(!isSignedIn) {
@@ -219,11 +251,6 @@ function App() {
   function signInUnstoppable() {
 
   }
-
-  let todaysDate = new Date().toISOString().substr(0, 16);
-  const [ projectEntry, setProjectEntry ] = useState({
-    name: '', description: '', uri: '', tags: '', dueDate: todaysDate, budget: 0
-  });
 
   function projectFormChanged(e, field) {
     let _projectEntry = { ...projectEntry };
@@ -241,13 +268,14 @@ function App() {
       console.log('wei', wei);
 
       let timeStamp = Math.floor(new Date(projectEntry.dueDate).getTime() / 1000);
+      let cleanedTags = cleanTags(projectEntry.tags).join(',');
 
       try {
         let tx = await contract.createProject(
           projectEntry.name, 
           projectEntry.description, 
           projectEntry.uri,
-          projectEntry.tags,
+          cleanedTags,
           timeStamp,
           wei.toString()
         );
@@ -263,6 +291,7 @@ function App() {
 
           (async () => {
             let _projects = await contract.getProjectsForUser(accounts[0]);
+            console.log('AP', _projects);
             setAllProjects(_projects);
           })();
         })
@@ -373,7 +402,7 @@ function App() {
           Tags (Comma Separated)
         </div>
         <div className="br-feature-control">
-          <input type="text" minLength="5" required value={projectEntry.tags} onChange={e => projectFormChanged(e, 'tags') } />
+          <input type="text" value={projectEntry.tags} onChange={e => projectFormChanged(e, 'tags') } />
         </div>
       </div>
       <div className="br-feature-row">
@@ -454,6 +483,9 @@ function App() {
         <div className="br-project-details">
           <div className="br-project-details-left">
             <div className="br-project-description">{proj.description}</div>
+            <div className="br-project-description">{proj.tags}</div>
+            <div className="br-project-description">Due: {formatDate(dateFromBigNumber(proj.dueDate))}</div>
+            <div className="br-project-description">Budget: {ethers.utils.formatEther(proj.budget)}</div>
           </div>
           <div className="br-project-details-right">
             <BrButton type="sumbit" label="Select" id={'selectProject' + projID} key={'submit' + projID}
@@ -472,39 +504,62 @@ function App() {
     return rows;
   }
 
+  function searchFormChanged(e, field) {
+    let _searchEntry = { ...searchEntry };
+    _searchEntry[field] = e.target.value;
+    setSearchEntry(_searchEntry);
+  }
+
+  function getSearchForm() {
+    return <div className="br-feature-panel">
+      <h3>Search Projects</h3>
+      <div className="br-feature-row">
+        <div className="br-feature-label">
+          Tags 
+        </div>
+        <div className="br-feature-control">
+          <input type="text" minLength="4" required value={searchEntry.tags} onChange={e => searchFormChanged(e, 'tags') } />
+        </div>
+      </div>
+    </div>
+  }
+
   function getSearchPage(projects) {
     let ui;
 
     ui = <div>
       <div className="br-page-panels">
         <div className="br-page-panel">
+          { getSearchForm() }
           <div> 
             { projects.length ? 
-              <div className="br-projects-list">
-                { getProjectsList(projects) }
-              </div>  
+              <Fragment>
+                <div className="br-projects-list">
+                  { getProjectsList(projects) }
+                </div>  
+              </Fragment>
               :
               getText('text_no_project_results')
-            }
-          </div>
+          }
         </div>
       </div>
     </div>
+  </div>
 
-    return <div className="br-profile-page">
-      {ui}
-    </div>
-  }
+  return <div className="br-profile-page">
+    {ui}
+  </div>
+}
 
-  function getTasksPage() {
-    let ui;
+function getTasksPage() {
+  let ui;
 
-    ui = <div className="br-page-panel">
-      You are not assigned to any tasks.
-      <br />
-      <br />
-      Use the Search panel to view projects to apply for.
-    </div>
+  ui = <div className="br-page-panel">
+    You are not assigned to any tasks.
+    <br />
+    <br />
+    Use the Search panel to view projects to apply for.
+  </div>
 
     return <div className="br-tasks-page">
       {ui}
