@@ -590,11 +590,15 @@
     background-color: $color-1-l2;
 }
 
+.br-project-row {
+}
+
 .br-project-heading {
     background-color: $color-1-l2;
     color: white;
-    padding: 0.2em;
+    padding: 0.2em 0.5em;
     text-align: left;
+    border-radius: $spacing-sm $spacing-sm 0 0;
 }
 
 .br-project-name {
@@ -609,7 +613,8 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    padding: $spacing-sm 0;
+    padding: $spacing-sm;
+    border: 1px solid $color-1-l2; 
 }
 
 .br-project-details-left {
