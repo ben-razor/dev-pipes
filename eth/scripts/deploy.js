@@ -12,9 +12,13 @@ const { ethers, upgrades } = require("hardhat");
 let network = hre.network.name;
 let proxyAddress;
 
-if(network === 'ropsten') {
+if(network === 'polygon') {
+  proxyAddress = '0xb671A76Fe1Ee4E8535d827AdD0b260Ab71A124a9';
+  impAddress = '0x3b21Fdbba3380A1A2459BdFab13166117a460E3d';
+}
+else if(network === 'ropsten') {
   proxyAddress = '0x8D0676Da7F8A4Ae60f988beD23006f919f044756';
-  impAddress = '0x0dc3fCA86dDa13F70C89146664954F199A0AdcbB';
+  impAddress = '0x7014fA3Ebb04D131B2101ABe4a1eBfA519E70527';
 }
 
 async function main() {

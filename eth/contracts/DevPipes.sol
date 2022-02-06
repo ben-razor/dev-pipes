@@ -85,6 +85,22 @@ contract DevPipes {
         projectIndex++;
     }
 
+    function editProject(uint256 projectId, string memory projectName, string memory description, string memory uri, 
+                           string memory tags, uint256 dueDate, uint256 budget) public {
+
+        assertProjectExists(projectId);
+        Project storage proj = projects[projectId];
+        require(proj.creator == msg.sender, "error_only_project_creator_can_edit");
+        require(proj.status == 0, "error_published_projects_cannot_be_edited"); 
+
+        proj.name = projectName;
+        proj.description = description;
+        proj.uri = uri;
+        proj.tags = tags;
+        proj.dueDate = dueDate;
+        proj.budget = budget;
+    }
+
     function assertProjectExists(uint256 projectId) internal view {
         require(projectId <= projectIndex - 1, "error_project_does_not_exist");
     }

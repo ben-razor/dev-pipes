@@ -62,6 +62,7 @@ describe("DevPipes contract", function () {
       let dueDate = Math.floor(Date.now() / 1000);
       let payment = 10n;
       let oneEth = payment**18n;
+      let pointOneEth = payment**17n;
 
       await hardhatDevPipes.connect(addr1).createProject(
         "DevPipes", "Creating the Dev Pipes DApp", "https://ipfs.io/ipfs/bafkreicr6p5fvmewvwzrmkanwcuc6a4cn4gjjacbhhblriigarhzemvfze",
@@ -72,6 +73,16 @@ describe("DevPipes contract", function () {
       console.log("PROJ", projects);
       expect(projects.length).to.equal(1);
       expect(projects[0].budget).to.equal(oneEth.toString());
+
+      await hardhatDevPipes.connect(addr1).editProject(projects[0].id,
+        "DevPipes", "Creating the Dev Pipes DApp", "https://ipfs.io/ipfs/bafkreicr6p5fvmewvwzrmkanwcuc6a4cn4gjjacbhhblriigarhzemvfze",
+        "eth", dueDate, pointOneEth.toString(), 
+      );
+
+      let projects1 = await hardhatDevPipes.getProjectsForUser(addr1.address);
+      expect(projects1.length).to.equal(1);
+      expect(projects1[0].budget).to.equal(pointOneEth.toString());
+      expect(projects1[0].tags).to.equal('eth');
     });
 
     it("Should add royalties", async function () {
