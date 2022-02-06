@@ -56,7 +56,7 @@ contract DevPipes {
     mapping(uint256 => Project[]) subProjects;
     mapping(uint256 => Payment[]) projectRoyalties;
     mapping(uint256 => Application[]) projectApplications;
-    
+
     function init() public {
         owner = msg.sender;
         name = "Dev Pipes";
@@ -118,6 +118,7 @@ contract DevPipes {
     }
 
     function addRoyalty(uint256 projectId, address user, uint256 amount) public {
+        require(projectId <= numProjects, "error_project_does_not_exist");
         Project memory proj = projects[projectId];
 
         require(proj.creator == msg.sender, "error_only_project_creator_can_edit");
@@ -135,9 +136,17 @@ contract DevPipes {
     }
 
     function publish(uint256 projectId) public {
+        require(projectId <= numProjects, "error_project_does_not_exist");
         Project storage proj = projects[projectId];
         require(proj.creator == msg.sender, "error_only_project_creator_can_edit");
         proj.status = 1;
+        for(uint256 i = 0; i < userProjects[msg.sender].length; i++) {
+            Project storage userProject = userProjects[msg.sender][i];
+            if(userProject.id == projectId) {
+                userProject.status = 1;
+                break;
+            }
+        }
     } 
 
     function getRoyaltiesTotal(uint256 projectId) public view returns(uint256) {

@@ -37,6 +37,7 @@ describe("DevPipes contract", function () {
     // for it to be deployed(), which happens once its transaction has been
     // mined.
     hardhatDevPipes = await DevPipes.deploy();
+    hardhatDevPipes.init();
   });
 
   // You can nest describe calls to create subsections.

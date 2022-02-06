@@ -47,12 +47,252 @@
       "address": "0xE11aE662454edcEd8e3B9B2104ebcc84b979b34d",
       "txHash": "0x8eaea648210e7e1d0c1ce3b22698f2267df7c86963c062ba798ab6ad51f83381",
       "kind": "transparent"
+    },
+    {
+      "address": "0x7fa0da86Cfc7c08800252Acb1FA4bb0e99ecF54d",
+      "txHash": "0x05155eea0b6338bca3d63fc72b991c2f10fd12f09f4bc293e8ec40b22c5b6d9f",
+      "kind": "transparent"
     }
   ],
   "impls": {
     "3a477b64e39a7892a0392ec842c0b11e3b4e7fcd2bb46f459593126537dd8483": {
       "address": "0xfeBcFfC4B20727CB597cAB0820B092e310Ebd45B",
       "txHash": "0x4663f3ce7fbea4b47800c6ccc245def9e9e53e916a7e881918a05737496a1133",
+      "layout": {
+        "storage": [
+          {
+            "contract": "DevPipes",
+            "label": "name",
+            "type": "t_string_storage",
+            "src": "contracts/DevPipes.sol:11"
+          },
+          {
+            "contract": "DevPipes",
+            "label": "symbol",
+            "type": "t_string_storage",
+            "src": "contracts/DevPipes.sol:12"
+          },
+          {
+            "contract": "DevPipes",
+            "label": "balance",
+            "type": "t_uint256",
+            "src": "contracts/DevPipes.sol:13"
+          },
+          {
+            "contract": "DevPipes",
+            "label": "numProjects",
+            "type": "t_uint256",
+            "src": "contracts/DevPipes.sol:14"
+          },
+          {
+            "contract": "DevPipes",
+            "label": "numSubProjects",
+            "type": "t_uint256",
+            "src": "contracts/DevPipes.sol:15"
+          },
+          {
+            "contract": "DevPipes",
+            "label": "numApplications",
+            "type": "t_uint256",
+            "src": "contracts/DevPipes.sol:16"
+          },
+          {
+            "contract": "DevPipes",
+            "label": "numPayments",
+            "type": "t_uint256",
+            "src": "contracts/DevPipes.sol:17"
+          },
+          {
+            "contract": "DevPipes",
+            "label": "owner",
+            "type": "t_address",
+            "src": "contracts/DevPipes.sol:50"
+          },
+          {
+            "contract": "DevPipes",
+            "label": "projects",
+            "type": "t_array(t_struct(Project)45_storage)dyn_storage",
+            "src": "contracts/DevPipes.sol:52"
+          },
+          {
+            "contract": "DevPipes",
+            "label": "applications",
+            "type": "t_array(t_struct(Application)60_storage)dyn_storage",
+            "src": "contracts/DevPipes.sol:53"
+          },
+          {
+            "contract": "DevPipes",
+            "label": "royalties",
+            "type": "t_array(t_struct(Payment)24_storage)dyn_storage",
+            "src": "contracts/DevPipes.sol:54"
+          },
+          {
+            "contract": "DevPipes",
+            "label": "userProjects",
+            "type": "t_mapping(t_address,t_array(t_struct(Project)45_storage)dyn_storage)",
+            "src": "contracts/DevPipes.sol:55"
+          },
+          {
+            "contract": "DevPipes",
+            "label": "subProjects",
+            "type": "t_mapping(t_uint256,t_array(t_struct(Project)45_storage)dyn_storage)",
+            "src": "contracts/DevPipes.sol:56"
+          },
+          {
+            "contract": "DevPipes",
+            "label": "projectRoyalties",
+            "type": "t_mapping(t_uint256,t_array(t_struct(Payment)24_storage)dyn_storage)",
+            "src": "contracts/DevPipes.sol:57"
+          },
+          {
+            "contract": "DevPipes",
+            "label": "projectApplications",
+            "type": "t_mapping(t_uint256,t_array(t_struct(Application)60_storage)dyn_storage)",
+            "src": "contracts/DevPipes.sol:58"
+          }
+        ],
+        "types": {
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_array(t_struct(Project)45_storage)dyn_storage": {
+            "label": "struct DevPipes.Project[]"
+          },
+          "t_struct(Project)45_storage": {
+            "label": "struct DevPipes.Project",
+            "members": [
+              {
+                "label": "id",
+                "type": "t_uint256"
+              },
+              {
+                "label": "parentId",
+                "type": "t_uint256"
+              },
+              {
+                "label": "creator",
+                "type": "t_address"
+              },
+              {
+                "label": "name",
+                "type": "t_string_storage"
+              },
+              {
+                "label": "description",
+                "type": "t_string_storage"
+              },
+              {
+                "label": "uri",
+                "type": "t_string_storage"
+              },
+              {
+                "label": "tags",
+                "type": "t_string_storage"
+              },
+              {
+                "label": "dueDate",
+                "type": "t_uint256"
+              },
+              {
+                "label": "budget",
+                "type": "t_uint256"
+              },
+              {
+                "label": "status",
+                "type": "t_uint8"
+              }
+            ]
+          },
+          "t_uint8": {
+            "label": "uint8"
+          },
+          "t_array(t_struct(Application)60_storage)dyn_storage": {
+            "label": "struct DevPipes.Application[]"
+          },
+          "t_struct(Application)60_storage": {
+            "label": "struct DevPipes.Application",
+            "members": [
+              {
+                "label": "id",
+                "type": "t_uint256"
+              },
+              {
+                "label": "applicant",
+                "type": "t_address"
+              },
+              {
+                "label": "projectID",
+                "type": "t_uint256"
+              },
+              {
+                "label": "details1",
+                "type": "t_string_storage"
+              },
+              {
+                "label": "details2",
+                "type": "t_string_storage"
+              },
+              {
+                "label": "accepted",
+                "type": "t_bool"
+              },
+              {
+                "label": "status",
+                "type": "t_uint8"
+              }
+            ]
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_struct(Payment)24_storage)dyn_storage": {
+            "label": "struct DevPipes.Payment[]"
+          },
+          "t_struct(Payment)24_storage": {
+            "label": "struct DevPipes.Payment",
+            "members": [
+              {
+                "label": "id",
+                "type": "t_uint256"
+              },
+              {
+                "label": "user",
+                "type": "t_address"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256"
+              },
+              {
+                "label": "status",
+                "type": "t_uint8"
+              }
+            ]
+          },
+          "t_mapping(t_address,t_array(t_struct(Project)45_storage)dyn_storage)": {
+            "label": "mapping(address => struct DevPipes.Project[])"
+          },
+          "t_mapping(t_uint256,t_array(t_struct(Project)45_storage)dyn_storage)": {
+            "label": "mapping(uint256 => struct DevPipes.Project[])"
+          },
+          "t_mapping(t_uint256,t_array(t_struct(Payment)24_storage)dyn_storage)": {
+            "label": "mapping(uint256 => struct DevPipes.Payment[])"
+          },
+          "t_mapping(t_uint256,t_array(t_struct(Application)60_storage)dyn_storage)": {
+            "label": "mapping(uint256 => struct DevPipes.Application[])"
+          }
+        }
+      }
+    },
+    "6ef21b2b5a92090b78805dfe20937097ff7478254f4216beae21bbd9e8c16c06": {
+      "address": "0x390a9167Ac3403c4E919DE48cf9e29f18eF8777B",
+      "txHash": "0xd64849d15a820b0964f9cdc39ac6742aa433ec40a1d35c755a81233cd56d57c8",
       "layout": {
         "storage": [
           {

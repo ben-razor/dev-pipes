@@ -4,7 +4,7 @@ let network = hre.network.name;
 let proxyAddress;
 
 if(network === 'ropsten') {
-  proxyAddress = '0xE11aE662454edcEd8e3B9B2104ebcc84b979b34d';
+  // proxyAddress = '0xE11aE662454edcEd8e3B9B2104ebcc84b979b34d';
 }
 
 async function main() {
@@ -16,11 +16,13 @@ async function main() {
   const DevPipes = await ethers.getContractFactory("DevPipes");
   let instance;
   let res;
+  let initRes;
 
   if(!proxyAddress) {
     console.log('Deploying contract');
     instance = await upgrades.deployProxy(DevPipes);
     res = await instance.deployed();
+    initRes = res.init();
   }
   else {
     console.log('Upgrading contract');
@@ -29,6 +31,7 @@ async function main() {
 
   console.log("Instance", instance);
   console.log("Res", res);
+  console.log("initRes", initRes);
   console.log("DevPipes address:", res.address);
 }
 
