@@ -256,10 +256,12 @@ function App() {
     if(activeProject.id) {
       let _subProjects = [];
       for(let proj of allProjects) {
+        let parentId = proj.parentId.toString();
+
         if(proj.id === activeProject.id) {
           setActiveProject(proj);
         }
-        else if(proj.parentId.toString() === activeProject.id.toString()) {
+        else if(parentId !== "0" && parentId === activeProject.id.toString()) {
           _subProjects.push(proj);
         }
       }
@@ -645,33 +647,44 @@ function App() {
     let rows = [];
 
     for(let proj of projects) {
-      let projID = proj.id.toString();
-      rows.push(<div className="br-project-row" key={projID}>
-        <div className="br-project-heading">
-          <div className="br-project-name">{proj.name}</div>
-        </div>
-        <div className="br-project-details">
-          <div className="br-project-details-left">
-            <div className="br-project-description">{proj.description}</div>
-            <div className="br-project-description">{proj.tags}</div>
-            <div className="br-project-description">Due: {formatDate(dateFromBigNumber(proj.dueDate))}</div>
-            <div className="br-project-description">Budget: {ethers.utils.formatEther(proj.budget)}</div>
-          </div>
-          <div className="br-project-details-right">
-            <BrButton type="sumbit" label="Select" id={'selectProject' + projID} key={'submit' + projID}
-                      className="br-button br-icon-button" onClick={e => selectProject(projID)}/>
-            <div className="br-separator"></div>
-            {proj.status === 0 ? 
-              <BrButton type="sumbit" label="Publish" id={'publishProject' + projID} key={'publish' + projID}
-                        className="br-button br-icon-button" onClick={e => publishProject(projID)}/>
-              :
-              <div className="">Published</div>
-            }
-          </div>
-        </div>
-      </div>);
+      rows.push(getProjectDetailsPanel(proj));
     }
     return rows;
+  }
+
+  function getProjectDetailsPanel(proj) {
+    let projID = proj.id.toString();
+    let ownProject = sameAccount(proj.creator, accounts[0]);
+
+    return <div className="br-project-row" key={projID}>
+      <div className="br-project-heading">
+        <div className="br-project-name">{proj.name}</div>
+      </div>
+      <div className="br-project-details">
+        <div className="br-project-details-left">
+          <div className="br-project-description">{proj.description}</div>
+          <div className="br-project-description">{proj.tags}</div>
+          <div className="br-project-description">Due: {formatDate(dateFromBigNumber(proj.dueDate))}</div>
+          <div className="br-project-description">Budget: {ethers.utils.formatEther(proj.budget)}</div>
+        </div>
+        <div className="br-project-details-right">
+          <BrButton type="sumbit" label="Select" id={'selectProject' + projID} key={'submit' + projID}
+                    className="br-button br-icon-button" onClick={e => selectProject(projID)}/>
+          <div className="br-separator"></div>
+          { ownProject ?
+              (
+              proj.status === 0 ? 
+                <BrButton type="sumbit" label="Publish" id={'publishProject' + projID} key={'publish' + projID}
+                          className="br-button br-icon-button" onClick={e => publishProject(projID)}/>
+                :
+                <div className="">Published</div>
+              )
+              : ''
+          }
+          
+        </div>
+      </div>
+    </div>
   }
 
   function searchFormChanged(e, field) {
@@ -787,12 +800,14 @@ function getTasksPage() {
     let ui = [];
 
     for(let subProject of subProjects) {
-      ui.push(<div key={subProject.id.toString()}>{subProject.name}</div>);
+      ui.push(getProjectDetailsPanel(subProject));
     }
 
     return <div>
       <h3>Subprojects</h3>
-      { ui }
+      {
+        ui.length ? ui : <div className="br-info-message">No Subprojects have been created</div>
+      }
     </div>
   }
 
