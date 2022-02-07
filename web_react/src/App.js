@@ -10,15 +10,18 @@ import getText from './data/world/text';
 import { ethers } from 'ethers';
 import devPipesContract from './data/contract/DevPipes';
 import chainConfig, { chainIdToAddress, getAbi, validNetwork } from './data/chainConfig';
+import env from './data/udConfig';
 import { StateCheck } from './js/helpers/helpers';
 import UAuth from '@uauth/js'
 
 const stateCheck = new StateCheck();
 
+console.log('env', env);
+
 const uauth = new UAuth({
-  clientID: '2ZatKOp/E4ItUFzBPdwRvD7oh3EhRnCTqIP7rM1MDD8=',
-  clientSecret: 'pylTQFwkDRQHw7fyLrVttnY7x6r8S/IEsjEWmImXq8s=',
-  redirectUri: 'https://dev-pipes.vercel.app/',
+  clientID: env.UD_CLIENT_ID,
+  clientSecret: env.UD_CLIENT_SECRET,
+  redirectUri: env.UD_REDIRECT_URI,
 })
 
 const TOAST_TIMEOUT = 4000;
@@ -372,10 +375,10 @@ function App() {
         provider.once(tx.hash, function(tx) {
           console.log('tx complete ', tx);
           if(type === 'create') {
-            toast('text_project_created');
+            toast(getText('text_project_created'));
           }
           else {
-            toast('text_project_updated');
+            toast(getText('text_project_updated'));
           }
 
           (async () => {
@@ -563,7 +566,7 @@ function App() {
 
         provider.once(tx.hash, function(tx) {
           console.log('tx complete ', tx);
-          toast('Publish complete');
+          toast(getText('text_project_published'));
 
           (async () => {
             let _projects = await contract.getProjectsForUser(accounts[0]);

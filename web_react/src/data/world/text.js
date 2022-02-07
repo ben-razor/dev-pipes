@@ -12,6 +12,7 @@ const text = {
     "text_project_creating": `Creating project on blockchain...`,
     "text_project_updating": `Updating project on blockchain...`,
     "text_project_none": `You have no projects`,
+    "text_project_published": `Publish complete`,
     "text_no_project_results": `No published projects found`,
     "success_image_upload": `Image uploaded`,
     "error_no_ethereum": `No wallet detected. Try Metamask!`,
