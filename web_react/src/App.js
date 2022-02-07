@@ -4,6 +4,7 @@ import Logo from './images/dev-pipes-2.png';
 import Infographic from './images/infographic-1.png';
 import { useToasts } from 'react-toast-notifications';
 import BrButton from './js/components/lib/BrButton';
+import BrModal from './js/components/lib/BrModal.js';
 import './css/_base.css';
 import './css/_content.css';
 import getText from './data/world/text';
@@ -12,7 +13,8 @@ import devPipesContract from './data/contract/DevPipes';
 import chainConfig, { chainIdToAddress, getAbi, validNetwork } from './data/chainConfig';
 import env from './data/udConfig';
 import { StateCheck } from './js/helpers/helpers';
-import UAuth from '@uauth/js'
+import UAuth from '@uauth/js';
+import Modal from 'react-modal';
 
 const stateCheck = new StateCheck();
 
@@ -53,12 +55,19 @@ function App() {
   const [ ownProjects, setOwnProjects ] = useState([]);
   const [ searchedProjects, setSearchedProjects ] = useState([]);
   const [ activeProject, setActiveProject ] = useState({});
+  const [ subProjects, setSubProjects ] = useState([]);
   const [ page, setPage ] = useState('projects');
   const [ error, setError ] = useState();
   const [ udInfo, setUDInfo ] = useState({});
+  const [modalState, setModalState] = useState({ open: false, title: '', content: ''}); 
+  const [ nameSub, setNameSub ] = useState('');
 
   let todaysDate = new Date().toISOString().substr(0, 16);
   const [ projectEntry, setProjectEntry ] = useState({
+    name: '', description: '', uri: '', tags: '', dueDate: todaysDate, budget: 0
+  });
+
+  const [ subProjectEntry, setSubProjectEntry ] = useState({
     name: '', description: '', uri: '', tags: '', dueDate: todaysDate, budget: 0
   });
 
@@ -189,7 +198,7 @@ function App() {
     if(contractChanged) {
       (async () => {
         try {
-          let _projects = await contract.getProjectsForUser(accounts[0]);
+          let _projects = await contract.getAllProjects();
           console.log('success projects', _projects);
 
           setAllProjects(_projects);
@@ -207,8 +216,11 @@ function App() {
 
     if(allProjects.length && accounts.length) {
       for(let proj of allProjects) {
+        console.log('PROJ', proj);
         if(sameAccount(proj.creator, accounts[0])) {
-          _ownProjects.push(proj);
+          if(proj.parentId.toString() === '0') {
+            _ownProjects.push(proj);
+          }
         }
 
         if(proj.status > 0) {
@@ -225,7 +237,9 @@ function App() {
           }
 
           if(include) {
-            _searchedProjects.push(proj);
+            if(proj.parentId.toString() === '0') {
+              _searchedProjects.push(proj);
+            }
           }
         }
       }
@@ -240,12 +254,16 @@ function App() {
 
   useEffect(() => {
     if(activeProject.id) {
+      let _subProjects = [];
       for(let proj of allProjects) {
         if(proj.id === activeProject.id) {
           setActiveProject(proj);
-          break;
+        }
+        else if(proj.parentId.toString() === activeProject.id.toString()) {
+          _subProjects.push(proj);
         }
       }
+      setSubProjects(_subProjects);
     }
   }, [allProjects, activeProject]);
 
@@ -320,43 +338,66 @@ function App() {
     })();
   }
 
-  function projectFormChanged(e, field) {
-    let _projectEntry = { ...projectEntry };
+  function projectFormChanged(e, field, type) {
+    let entryData = projectEntry;
+    if(type === 'subtask') {
+      entryData = subProjectEntry;
+    }
+
+    let _projectEntry = { ...entryData};
     _projectEntry[field] = e.target.value;
-    setProjectEntry(_projectEntry);
+    if(type !== 'subtask') {
+      setProjectEntry({..._projectEntry});
+    }
+    else {
+      setSubProjectEntry({..._projectEntry});
+    }
   }
 
   function submitProject(e, type='create') {
     (async () => {
-      console.log('p1');
-      let wei = ethers.utils.parseEther(projectEntry.budget.toString());
-      console.log('p2');
+      let entryData = projectEntry;
+      if(type === 'subtask') {
+        entryData = subProjectEntry
+      }
+      let wei = ethers.utils.parseEther(entryData.budget.toString());
       console.log('wei', wei);
 
-      let timeStamp = Math.floor(new Date(projectEntry.dueDate).getTime() / 1000);
-      let cleanedTags = cleanTags(projectEntry.tags).join(',');
+      let timeStamp = Math.floor(new Date(entryData.dueDate).getTime() / 1000);
+      let cleanedTags = cleanTags(entryData.tags).join(',');
       let tx;
-      console.log('Submit proj ' + type);
       
-      console.log('p3');
       try {
         if(type === 'create') {
           tx = await contract.createProject(
-            projectEntry.name, 
-            projectEntry.description, 
-            projectEntry.uri,
+            entryData.name, 
+            entryData.description, 
+            entryData.uri,
             cleanedTags,
             timeStamp,
             wei.toString()
           );
         }
-        else {
+        else if(type === 'edit') {
           console.log('Editing start!!');
           tx = await contract.editProject(
             activeProject.id,
-            projectEntry.name, 
-            projectEntry.description, 
-            projectEntry.uri,
+            entryData.name, 
+            entryData.description, 
+            entryData.uri,
+            cleanedTags,
+            timeStamp,
+            wei.toString()
+          );
+          console.log('Editing!!');
+        }
+        else if(type === 'subtask') {
+          console.log('Create subproject start!!');
+          tx = await contract.createSubProject(
+            activeProject.id,
+            entryData.name, 
+            entryData.description, 
+            entryData.uri,
             cleanedTags,
             timeStamp,
             wei.toString()
@@ -367,7 +408,7 @@ function App() {
         console.log('p4');
         console.log('tx', tx);
 
-        let _projects = await contract.getProjectsForUser(accounts[0]);
+        let _projects = await contract.getAllProjects();
         setAllProjects(_projects);
 
         provider.once(tx.hash, function(tx) {
@@ -380,7 +421,7 @@ function App() {
           }
 
           (async () => {
-            let _projects = await contract.getProjectsForUser(accounts[0]);
+            let _projects = await contract.getAllProjects();
             console.log('AP', _projects);
             setAllProjects(_projects);
           })();
@@ -398,6 +439,9 @@ function App() {
         if(e.error && e.error.code === -32603) {
           toast(getText(e.error.message.replace('execution reverted: ', '')))
           console.log(e);
+        }
+        else if(e.code === 4001) {
+          toast(getText('text_transaction_cancelled'));
         }
         else {
           if(type === 'create') {
@@ -476,16 +520,30 @@ function App() {
     return date.toISOString().substr(0, 16).replace('T', ' ');
   }
 
+  function createSubprojectStart(e, projectId) {
+    openModal();
+  }
+
   function getCreateProjectForm(type='create') {
+    let entryData = projectEntry;
+    if(type === 'subtask') {
+      entryData = subProjectEntry;
+    }
+
     return <div className="br-feature-panel">
-      <h3>{ type === 'create' ? 'Create New Project' : 'Edit Project' }</h3>
+      {
+        type !== 'subtask' ?
+          <h3>{ type === 'create' ? 'Create New Project' : 'Edit Project' }</h3>
+          :
+          ''
+      }
       <form onSubmit={ e => submitProject(e, type) }>
       <div className="br-feature-row">
         <div className="br-feature-label">
           Name
         </div>
         <div className="br-feature-control">
-          <input type="text" minLength="4" required value={projectEntry.name} onChange={e => projectFormChanged(e, 'name') } />
+          <input type="text" minLength="4" required value={entryData.name} onChange={e => projectFormChanged(e, 'name', type) } />
         </div>
       </div>
       <div className="br-feature-row">
@@ -493,7 +551,7 @@ function App() {
           Description 
         </div>
         <div className="br-feature-control">
-          <input type="text" minLength="8" required value={projectEntry.description} onChange={e => projectFormChanged(e, 'description') } />
+          <input type="text" minLength="8" required value={entryData.description} onChange={e => projectFormChanged(e, 'description', type) } />
         </div>
       </div>
       <div className="br-feature-row">
@@ -501,7 +559,7 @@ function App() {
           Media URI
         </div>
         <div className="br-feature-control">
-          <input type="text" value={projectEntry.uri} onChange={e => projectFormChanged(e, 'uri') } />
+          <input type="text" value={entryData.uri} onChange={e => projectFormChanged(e, 'uri', type) } />
         </div>
       </div>
       <div className="br-feature-row">
@@ -509,7 +567,7 @@ function App() {
           Tags (Comma Separated)
         </div>
         <div className="br-feature-control">
-          <input type="text" value={projectEntry.tags} onChange={e => projectFormChanged(e, 'tags') } />
+          <input type="text" value={entryData.tags} onChange={e => projectFormChanged(e, 'tags', type) } />
         </div>
       </div>
       <div className="br-feature-row">
@@ -517,7 +575,7 @@ function App() {
           Due Date
         </div>
         <div className="br-feature-control">
-          <input type="datetime-local" value={projectEntry.dueDate} onChange={e => projectFormChanged(e, 'dueDate') } />
+          <input type="datetime-local" value={entryData.dueDate} onChange={e => projectFormChanged(e, 'dueDate', type) } />
         </div>
       </div>
       <div className="br-feature-row">
@@ -525,7 +583,7 @@ function App() {
           Budget (Eth)
         </div>
         <div className="br-feature-control">
-          <input type="number" value={projectEntry.budget} step="0.0001" min="0" onChange={e => projectFormChanged(e, 'budget') } />
+          <input type="number" value={entryData.budget} step="0.0001" min="0" onChange={e => projectFormChanged(e, 'budget', type) } />
         </div>
       </div>
       <div className="br-feature-row">
@@ -534,6 +592,12 @@ function App() {
         <div className="br-feature-control">
           <BrButton type="sumbit" label={ type === 'create' ? "Create Project" : "Submit" } id="createProject" 
                     className="br-button br-icon-button" />
+          { type === 'edit' ?
+            <BrButton type="button" label="Create Subproject" id="createSubproject" className="br-button br-icon-button" 
+                      onClick={ e => createSubprojectStart(e, activeProject.id) } />
+            :
+            ''
+          }
         </div>
       </div>
       </form>
@@ -559,7 +623,7 @@ function App() {
 
         console.log('tx', tx);
 
-        let _projects = await contract.getProjectsForUser(accounts[0]);
+        let _projects = await contract.getAllProjects();
         setAllProjects(_projects);
 
         provider.once(tx.hash, function(tx) {
@@ -567,7 +631,7 @@ function App() {
           toast(getText('text_project_published'));
 
           (async () => {
-            let _projects = await contract.getProjectsForUser(accounts[0]);
+            let _projects = await contract.getAllProjects();
             setAllProjects(_projects);
           })();
         })
@@ -581,7 +645,6 @@ function App() {
     let rows = [];
 
     for(let proj of projects) {
-      console.log(proj);
       let projID = proj.id.toString();
       rows.push(<div className="br-project-row" key={projID}>
         <div className="br-project-heading">
@@ -716,11 +779,24 @@ function getTasksPage() {
       _projectEntry.dueDate = dateFromBigNumber(activeProject.dueDate).toISOString().substr(0, 16);
       _projectEntry.budget = ethers.utils.formatEther(activeProject.budget.toString());
       setProjectEntry(_projectEntry);
+      setSubProjectEntry({..._projectEntry});
     }
   }, [activeProject]);
 
+  function getSubProjectsUI() {
+    let ui = [];
+
+    for(let subProject of subProjects) {
+      ui.push(<div key={subProject.id.toString()}>{subProject.name}</div>);
+    }
+
+    return <div>
+      <h3>Subprojects</h3>
+      { ui }
+    </div>
+  }
+
   function getActiveProjectPage(activeProject) {
-    console.log('CA', activeProject.creator, accounts[0]);
     return <div className="br-active-project-page">
       <div className="br-back-button-holder">
         <BrButton label={<i className="fa fa-arrow-left"></i>} id="goBackActiveProject" 
@@ -739,6 +815,10 @@ function getTasksPage() {
             }
           </div>
         </div>
+      </div>
+
+      <div className="br-sub-projects">
+        { getSubProjectsUI() }
       </div>
 
     </div>
@@ -789,8 +869,63 @@ function getTasksPage() {
     </div>
   }
 
+  const customStyles = {
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      transform: 'translate(-50%, -50%)',
+      borderRadius: '8px 8px 0 0',
+      padding: 0
+    },
+    overlay: {zIndex: 999}
+  };
+
+  function closeModal() {
+    setModalState({...modalState, open: false});
+  }
+
+  const [modalIsOpen, setIsOpen] = React.useState(false);
+
+  function openModal() {
+    setIsOpen(true);
+  }
+
+  function afterOpenModal() {
+
+  }
+
+  function closeModal() {
+    setIsOpen(false);
+  }
+
   return (
     <div className="br-page">
+    <div>
+      <Modal
+        isOpen={modalIsOpen}
+        onAfterOpen={afterOpenModal}
+        onRequestClose={closeModal}
+        style={customStyles}
+        contentLabel="Example Modal"
+      >
+        <div className="br-modal-title">
+          <h2 className="br-modal-heading">Create Subproject</h2>
+          <div className="br-modal-close">
+            <BrButton label={<i className="fas fa-times-circle" />} className="br-button br-icon-button" 
+                        onClick={closeModal} />
+          </div>
+        </div>
+        <div className="br-modal-panel">
+          <div className="br-modal-content>">
+            { getCreateProjectForm('subtask') } 
+          </div>
+        </div>
+      </Modal>
+    </div>
+      <BrModal modalState={modalState} setModalState={setModalState} />
       <div className="br-header">
         <div className="br-header-logo-panel">
         </div>

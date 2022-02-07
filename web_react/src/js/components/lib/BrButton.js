@@ -12,6 +12,7 @@ function BrButton(props) {
   let hideLabelDuringSubmit = props.hideLabelDuringSubmit;
   let handleMsg = props.handleMsg;
   let disabledLabel = props.disabledLabel;
+  const type = props.type;
   const isSubmitting = props.isSubmitting;
   const setIsSubmitting = props.setIsSubmitting;
   let [isSubmittingInternal, setIsSubmittingInternal] = useState();
@@ -35,7 +36,9 @@ function BrButton(props) {
     }
   }, [isSubmitting]);
 
-  return <button type="submit" disabled={disabledLabel || (isSubmitting && isSubmittingInternal)} className={ className || '' } onClick={onClick}>
+  const buttonType = type || 'submit';
+
+  return <button type={type} disabled={disabledLabel || (isSubmitting && isSubmittingInternal)} className={ className || '' } onClick={onClick}>
     { isSubmittingInternal ? 
       <i className="fa fa-refresh fa-spin" style={{ 
         marginRight: isSubmitting && !hideLabelDuringSubmit ? '5px' : '',

@@ -628,3 +628,41 @@
 .br-separator {
     height: 0.5em;
 }
+
+.br-modal-panel {
+    min-height: 12em;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.br-modal-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+}
+
+.br-modal-button {
+    margin: 0.5em;
+}
+
+.br-project-panel {
+    min-width: 30em;
+    min-height: 18em;
+    padding: 0 1em;
+}
+
+.br-modal-title {
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    align-items: center;
+    padding: 0.2em 1em;
+    margin-bottom: 0.5em;
+    justify-content: space-between;
+    border-radius: 0.5em 0.5em 0.2em 0.2em;
+    background-color: hsl(338deg 8% 25%);
+    color: white;
+    background-image: linear-gradient(269deg, transparent 0%, hsl(342deg 48% 42%) 99%, transparent 100%);
+    font-size: 0.9em;    
+}

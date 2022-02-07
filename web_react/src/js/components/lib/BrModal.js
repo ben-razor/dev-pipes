@@ -43,7 +43,7 @@ function BrModal(props) {
         <div className="br-modal-title">
           <h2 className="br-modal-heading">{modalState.title}</h2>
           <div className="br-modal-close">
-            <AqexButton label={<i className="fas fa-times-circle" />} className="br-button br-icon-button" 
+            <BrButton label={<i className="fas fa-times-circle" />} className="br-button br-icon-button" 
                         onClick={closeModal} />
           </div>
         </div>
