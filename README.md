@@ -2,7 +2,17 @@
 
 A decentralized project management app with automatic payment flows.
 
-## How does it work
+## Unstoppable Domains Integration
+
+Unstoppable Domains login is integrated as part of the [Gitcoin Hackathon](https://gitcoin.co/issue/unstoppabledomains/gitcoin-bounties/4/100027487).
+
+Use the [Application](https://dev-pipes.vercel.app/)
+
+View the [Code](https://github.com/ben-razor/dev-pipes/blob/main/web_react/src/App.js)  
+
+Check out the [Demo Video](https://youtu.be/u6xLRlKB7nc)  
+
+## Concept
 
 1. Anyone with a wallet can create a project with a description of what needs delivering
 2. A total budget for the project is specified
@@ -11,4 +21,3 @@ A decentralized project management app with automatic payment flows.
 5. The subprojects can be broken down recursively in the same way
 6. Developers can then implement the sub projects.
 7. When the project and subproject conditions are met all the developers in the tree can collect their payments
-
