@@ -2,6 +2,8 @@
 
 A decentralized project management app with automatic payment flows.
 
+Front end code is in the https://github.com/ben-razor/dev-pipes/tree/main/web_react folder.
+
 ## Unstoppable Domains Integration
 
 Login with Unstoppable is integrated as part of the [Gitcoin Hackathon](https://gitcoin.co/issue/unstoppabledomains/gitcoin-bounties/4/100027487).
