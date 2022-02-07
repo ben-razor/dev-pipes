@@ -10,7 +10,9 @@ Use the [Application](https://dev-pipes.vercel.app/)
 
 View the [Code](https://github.com/ben-razor/dev-pipes/blob/main/web_react/src/App.js)  
 
-Check out the [Demo Video](https://youtu.be/u6xLRlKB7nc)  
+Check out the [Demo Video](https://youtu.be/u6xLRlKB7nc) 
+
+Note that Unstoppable login cannot be used on a local version as it redirects to the live application.
 
 ## Concept
 
