@@ -4,7 +4,7 @@ A decentralized project management app with automatic payment flows.
 
 ## Unstoppable Domains Integration
 
-Unstoppable Domains login is integrated as part of the [Gitcoin Hackathon](https://gitcoin.co/issue/unstoppabledomains/gitcoin-bounties/4/100027487).
+Login with Unstoppable is integrated as part of the [Gitcoin Hackathon](https://gitcoin.co/issue/unstoppabledomains/gitcoin-bounties/4/100027487).
 
 Use the [Application](https://dev-pipes.vercel.app/)
 
