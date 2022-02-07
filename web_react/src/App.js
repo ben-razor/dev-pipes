@@ -16,8 +16,6 @@ import UAuth from '@uauth/js'
 
 const stateCheck = new StateCheck();
 
-console.log('env', env);
-
 const uauth = new UAuth({
   clientID: env.UD_CLIENT_ID,
   clientSecret: env.UD_CLIENT_SECRET,
