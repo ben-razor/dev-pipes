@@ -465,6 +465,10 @@ function App() {
     return date.toISOString().substr(0, 16).replace('T', ' ');
   }
 
+  function createSubTask(e, projectId) {
+    alert('Create subtask on ' + projectId);
+  }
+
   function getCreateProjectForm(type='create') {
     return <div className="br-feature-panel">
       <h3>{ type === 'create' ? 'Create New Project' : 'Edit Project' }</h3>
@@ -521,8 +525,15 @@ function App() {
         <div className="br-feature-label">
         </div>
         <div className="br-feature-control">
-          <BrButton type="sumbit" label={ type === 'create' ? "Create Project" : "Submit" } id="createProject" 
+          <BrButton type="sumbit" label={ type === 'create' ? "Create Project" : "Submita" } id="createProject" 
                     className="br-button br-icon-button" />
+          
+          { type === 'edit' ?
+            <BrButton label="Create Sub Task" id="createSubTask" className="br-button br-icon-button" 
+                      onClick={ e => createSubtask(e, activeProject.id) } />
+            :
+            ''
+          }
         </div>
       </div>
       </form>

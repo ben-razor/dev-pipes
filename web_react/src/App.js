@@ -405,6 +405,7 @@ function App() {
             wei.toString()
           );
           console.log('Editing!!');
+          closeModal();
         }
 
         console.log('p4');
@@ -508,7 +509,7 @@ function App() {
           Budget (Eth)
         </div>
         <div className="br-feature-control">
-          {ethers.utils.formatEther(project.payment.toString())}
+          {ethers.utils.formatEther(project.budget.toString())}
         </div>
       </div>
     </div>
@@ -607,9 +608,11 @@ function App() {
   }
 
   function selectProject(id) {
+    console.log('selecting ', id);
     let _activeProject = {};
     for(let proj of allProjects) {
       let projID = proj[0].toString();
+
       if(projID === id) {
         _activeProject = proj;
       }

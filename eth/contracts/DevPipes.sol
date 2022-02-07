@@ -60,16 +60,18 @@ contract DevPipes {
     mapping(uint256 => uint256[]) public projectApplications;
 
     function init() public {
-        owner = msg.sender;
-        name = "Dev Pipes";
-        symbol = "PIPES";
-        balance = 0;
-        projects.push(Project(0, 0, 0, address(0), "", "", "", "", 0, 0, 0));
-        projectIndex = 1;
-        applications.push(Application(0, address(0), 0, "", "", false, 0));
-        applicationIndex = 1;
-        royalties.push(Payment(0, address(0), 0, 0));
-        paymentsIndex = 1;
+        if(owner == address(0)) {
+            owner = msg.sender;
+            name = "Dev Pipes";
+            symbol = "PIPES";
+            balance = 0;
+            projects.push(Project(0, 0, 0, address(0), "", "", "", "", 0, 0, 0));
+            projectIndex = 1;
+            applications.push(Application(0, address(0), 0, "", "", false, 0));
+            applicationIndex = 1;
+            royalties.push(Payment(0, address(0), 0, 0));
+            paymentsIndex = 1;
+        }
     }
 
     function createProject(string memory projectName, string memory description, string memory uri, 

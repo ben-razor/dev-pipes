@@ -13,8 +13,11 @@ let network = hre.network.name;
 let proxyAddress;
 
 if(network === 'polygon') {
-  proxyAddress = '0xb671A76Fe1Ee4E8535d827AdD0b260Ab71A124a9';
-  impAddress = '0xfeBcFfC4B20727CB597cAB0820B092e310Ebd45B';
+  // proxyAddress = '0xb671A76Fe1Ee4E8535d827AdD0b260Ab71A124a9';
+  // impAddress = '0xeE008643692D4C57493348b1a67302E3fd607C2e';
+
+  proxyAddress = '0x7fa0da86Cfc7c08800252Acb1FA4bb0e99ecF54d';
+  impAddress = '0xeE008643692D4C57493348b1a67302E3fd607C2e';
 }
 else if(network === 'ropsten') {
   proxyAddress = '0x8D0676Da7F8A4Ae60f988beD23006f919f044756';
@@ -36,12 +39,13 @@ async function main() {
     console.log('Deploying contract');
     instance = await upgrades.deployProxy(DevPipes);
     res = await instance.deployed();
-    initRes = res.init();
+    initRes = await res.init();
   }
   else {
     console.log('Upgrading contract');
     instance = await upgrades.upgradeProxy(proxyAddress, DevPipes);
     res = await instance.deployed();
+    initRes = await res.init();
   }
 
   console.log("Proxy address:", res.address);
