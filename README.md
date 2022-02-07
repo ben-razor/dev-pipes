@@ -2,7 +2,7 @@
 
 A decentralized project management app with automatic payment flows.
 
-Front end code is in the https://github.com/ben-razor/dev-pipes/tree/main/web_react folder.
+Front end code is in the [web_react](https://github.com/ben-razor/dev-pipes/tree/main/web_react) folder.
 
 ## Unstoppable Domains Integration
 
