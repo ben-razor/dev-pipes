@@ -16,6 +16,8 @@ Check out the [Demo Video](https://youtu.be/u6xLRlKB7nc)
 
 Note that Unstoppable login cannot be used on a local version as it redirects to the live application.
 
+Github, Gitcoin, Discord handle **ben-razor**.
+
 ## Concept
 
 1. Anyone with a wallet can create a project with a description of what needs delivering
