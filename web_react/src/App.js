@@ -724,7 +724,7 @@ function App() {
       <div className="br-project-details">
         <div className="br-project-details-left">
           <div className="br-project-description">{proj.description}</div>
-          <div className="br-project-description">{proj.tags}</div>
+          <div className="br-project-description">Tags: {proj.tags}</div>
           <div className="br-project-description">Due: {formatDate(dateFromBigNumber(proj.dueDate))}</div>
           <div className="br-project-description">Budget: {ethers.utils.formatEther(proj.budget)}</div>
         </div>
