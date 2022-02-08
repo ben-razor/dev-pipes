@@ -59,6 +59,11 @@ contract DevPipes {
     mapping(uint256 => uint256[]) public projectRoyalties;
     mapping(uint256 => uint256[]) public projectApplications;
 
+    event ProjectCreated(address indexed _creator, uint256 _id);
+    event ProjectEdited(address indexed _editor, uint256 indexed _id);
+    event SubProjectCreated(address indexed _creator, uint256 indexed _id, uint256 indexed rootId, uint256 parentId);
+    event ProjectPublished(uint256 indexed _id);
+
     function init() public {
         if(owner == address(0)) {
             owner = msg.sender;
@@ -84,6 +89,8 @@ contract DevPipes {
         projects.push(project);
         userProjects[msg.sender].push(projectIndex);
 
+        emit ProjectCreated(msg.sender, projectIndex);
+
         projectIndex++;
     }
 
@@ -93,7 +100,7 @@ contract DevPipes {
         assertProjectExists(projectId);
         Project storage proj = projects[projectId];
         require(proj.creator == msg.sender, "error_only_project_creator_can_edit");
-        require(proj.status == 0, "error_published_projects_cannot_be_edited"); 
+        // require(proj.status == 0, "error_published_projects_cannot_be_edited"); 
 
         proj.name = projectName;
         proj.description = description;
@@ -101,6 +108,8 @@ contract DevPipes {
         proj.tags = tags;
         proj.dueDate = dueDate;
         proj.budget = budget;
+
+        emit ProjectEdited(msg.sender, projectId);
     }
 
     function assertProjectExists(uint256 projectId) internal view {
@@ -126,6 +135,7 @@ contract DevPipes {
         subProjects[rootId].push(projectIndex);
         userProjects[msg.sender].push(projectIndex);
 
+        emit SubProjectCreated(msg.sender, projectIndex, rootId, parentId);
         projectIndex++;
     }
 
@@ -174,6 +184,7 @@ contract DevPipes {
         Project storage proj = projects[projectId];
         require(proj.creator == msg.sender, "error_only_project_creator_can_edit");
         proj.status = 1;
+        emit ProjectPublished(projectId);
     } 
 
     function getRoyaltiesTotal(uint256 projectId) public view returns(uint256) {
