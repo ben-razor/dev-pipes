@@ -1,14 +1,18 @@
 import chains from './chains';
 import devPipesContract from './contract/DevPipes';
+import { isLocal } from '../js/helpers/helpers';
 
 const validNetworks = [0x89];
+if(isLocal()) {
+  validNetworks.push(3);
+}
 
 const chainConfig = {
   contracts: {
     'devPipes': {
       abi: devPipesContract.abi,
       address: {
-        'rop': '0x8D0676Da7F8A4Ae60f988beD23006f919f044756',
+        'rop': '0x4FFBB5fEa02d16e47bB769880f4C8d6024505714',
         'matic': '0x7fa0da86Cfc7c08800252Acb1FA4bb0e99ecF54d'
       }
     }

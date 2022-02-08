@@ -6,7 +6,7 @@ const text_consts = {
 
 const text = {
   "en": {
-    "text_network_info": `Please set network to Polygon`,  
+    "text_network_info": `Please set network to Polygon/Matic`,  
     "text_project_subtitle": `Decentralized project management`,
     "text_project_created": `Project created`,
     "text_project_updated": `Project updated`,
@@ -16,11 +16,13 @@ const text = {
     "text_project_published": `Publish complete`,
     "text_transaction_cancelled": `Transaction cancelled`,
     "text_no_project_results": `No published projects found`,
+    "text_then_reload": `The reload application`,
     "success_image_upload": `Image uploaded`,
     "error_no_ethereum": `No wallet detected. Try Metamask!`,
     "error_project_created": 'Error creating project',
     "error_project_updated": 'Error updating project',
     "error_invalid_network": `Network is not supported`,
+    "error_network_unavailable": `Blockchain network is unavailable`,
     "error_image_upload_failed": `Image upload failed`,
     "error_metamask_accounts_pending": `A connection request is pending`,
     "error_please_check_wallet": `Please check your Eth Wallet`,

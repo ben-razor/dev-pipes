@@ -40,6 +40,10 @@ function App() {
     });
   }, [addToast]);
 
+  const tripleToast = useCallback((message1, message2, message3, type='info') => {
+    toast( <Fragment><div>{message1}</div><div>{message2}</div><div>{message3}</div></Fragment>, type)
+  }, [toast]);
+
   const doubleToast = useCallback((message1, message2, type='info') => {
     toast( <Fragment><div>{message1}</div><div>{message2}</div></Fragment>, type)
   }, [toast]);
@@ -94,6 +98,14 @@ function App() {
           console.log('Pre getNetwork');
           const network = await provider.getNetwork();
           const networkId = parseInt(network.chainId);
+
+          if(!networkId) {
+            tripleToast(
+              getText('error_network_unavailable'), getText('error_please_check_wallet'),
+              getText('text_then_reload')
+            );
+          }
+
           setNetworkId(networkId);
           setNetworkConfig({
             contractAddress: chainIdToAddress('devPipes', networkId),
