@@ -15,6 +15,7 @@ import env from './data/udConfig';
 import { StateCheck } from './js/helpers/helpers';
 import UAuth from '@uauth/js';
 import Modal from 'react-modal';
+import { display } from '@uauth/web3modal';
 
 const stateCheck = new StateCheck();
 
@@ -59,8 +60,9 @@ function App() {
   const [ page, setPage ] = useState('projects');
   const [ error, setError ] = useState();
   const [ udInfo, setUDInfo ] = useState({});
-  const [modalState, setModalState] = useState({ open: false, title: '', content: ''}); 
+  const [ modalState, setModalState ] = useState({ open: false, title: '', content: ''}); 
   const [ nameSub, setNameSub ] = useState('');
+  const [ subTree, setSubTree ] = useState();
 
   let todaysDate = new Date().toISOString().substr(0, 16);
   const [ projectEntry, setProjectEntry ] = useState({
@@ -117,7 +119,7 @@ function App() {
         catch(e) {
           console.log(e);
           if(e.code === -32002) {
-            doubleToast(getText('error_metamast_accounts_pending'), getText('error_please_check_wallet'));
+            doubleToast(getText('error_metamask_accounts_pending'), getText('error_please_check_wallet'));
           }
         }
 
@@ -254,20 +256,76 @@ function App() {
 
   useEffect(() => {
     if(activeProject.id) {
+      let activeProjId = activeProject.id.toString();
+      let activeProjRootId = activeProject.rootId.toString();
+      if(activeProjRootId === '0') {
+        activeProjRootId = activeProjId;
+      }
+
       let _subProjects = [];
+      let allChildren = [];
+
       for(let proj of allProjects) {
         let parentId = proj.parentId.toString();
+        let rootId = proj.rootId.toString();
 
         if(proj.id === activeProject.id) {
           setActiveProject(proj);
         }
-        else if(parentId !== "0" && parentId === activeProject.id.toString()) {
+        else if(parentId !== "0" && parentId === activeProjId) {
           _subProjects.push(proj);
         }
+        if(rootId === activeProjRootId || proj.id.toString() === activeProjRootId) {
+          let _proj = {...proj};
+          _proj.idStr = proj.id.toString();
+          _proj.parentIdStr = proj.parentId.toString();
+          allChildren.push(_proj);
+        }
       }
+
+      console.log(allChildren);
+      let subTree = createSubTree(allChildren, 'idStr', 'parentIdStr', 0);
+      setSubTree(subTree);
+
       setSubProjects(_subProjects);
     }
   }, [allProjects, activeProject]);
+
+  function displayTree(tree, level=0, treeUI=[]) {
+    treeUI.push(<div key={tree.idStr} className={"br-project-tree-item"} 
+                     style={ { marginLeft: `${level/2}em`}} onClick={e => selectProject(tree.idStr)}>
+      {tree.name}
+    </div>);
+
+    for(let child of tree.Children) {
+      treeUI.push(displayTree(child, level + 1, []));
+    }
+    return treeUI;
+  }
+
+  function createSubTree(treeData, key, parentKey, rootIndex=-1)
+  {
+      var keys = [];
+      treeData.map(function(x){
+          x.Children = [];
+          keys.push(x[key]);
+      });
+      var roots = treeData.filter(function(x){return keys.indexOf(x[parentKey])==-1});
+      var nodes = [];
+      roots.map(function(x){nodes.push(x)});
+      while(nodes.length > 0)
+      {
+
+          var node = nodes.pop();
+          var children =  treeData.filter(function(x){return x[parentKey] == node[key]});
+          children.map(function(x){
+              node.Children.push(x);
+              nodes.push(x)
+          });
+      }
+      if (roots.length==1) return roots[0];
+      return roots;
+  }
 
   function cleanTags(tagsStr) {
     let tags = tagsStr.split(',').map(x => x.trim().toLowerCase().replace(/[ ]+/, '-'));
@@ -806,11 +864,11 @@ function getTasksPage() {
       ui.push(getProjectDetailsPanel(subProject));
     }
 
+    let noSubProjectsUI = <div className="br-info-message">No Subprojects have been created</div>;
+
     return <div>
       <h3>Subprojects</h3>
-      {
-        ui.length ? ui : <div className="br-info-message">No Subprojects have been created</div>
-      }
+      { ui.length ? ui : noSubProjectsUI }
     </div>
   }
 
@@ -823,6 +881,12 @@ function getTasksPage() {
       </div>
       <h1>{ activeProject.name }</h1>
       <div className="br-page-panels">
+        <div className="br-page-panel br-page-panel-thin">
+          <h3>Project Tree</h3>
+          <div className="br-project-tree">
+            { subTree ?  displayTree(subTree) : '' }
+          </div>
+        </div>
         <div className="br-page-panel">
           <div className="br-active-project-page">
             { 
@@ -966,7 +1030,7 @@ function getTasksPage() {
           getMainPages()
           :
           <div className="br-front-page">
-            Decentralized project management with automatic payment flows.
+            
             {error ? <div className="br-info-message">{ getText(error) }</div> : ''}
             <div className="br-sign-in-panel">
               { !isSignedIn ? 

@@ -575,6 +575,10 @@
     margin: 0.5em;
 }
 
+.br-page-panel-thin {
+    flex: 0;
+}
+
 .br-project-row {
     margin-bottom: 0.5em;
 }
@@ -693,4 +697,22 @@
 
 .br-modal-heading {
     color: white;
+}
+
+.br-project-tree {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    min-width: 12em;
+}
+
+.br-project-tree-item {
+    max-width: 12em;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    color:hsl(200, 50%, 50%);
+    text-decoration: underline;
+    cursor: pointer;
 }

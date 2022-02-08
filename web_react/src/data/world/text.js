@@ -7,6 +7,7 @@ const text_consts = {
 const text = {
   "en": {
     "text_network_info": `Please set network to Polygon`,  
+    "text_project_subtitle": `Decentralized project management`,
     "text_project_created": `Project created`,
     "text_project_updated": `Project updated`,
     "text_project_creating": `Creating project on blockchain...`,
@@ -21,7 +22,7 @@ const text = {
     "error_project_updated": 'Error updating project',
     "error_invalid_network": `Network is not supported`,
     "error_image_upload_failed": `Image upload failed`,
-    "error_metamast_accounts_pending": `A connection request is pending`,
+    "error_metamask_accounts_pending": `A connection request is pending`,
     "error_please_check_wallet": `Please check your Eth Wallet`,
     "error_published_projects_cannot_be_edited": `Published projects cannot be edited`,
     "error_only_project_creator_can_edit": `Only project creator can edit project`,
