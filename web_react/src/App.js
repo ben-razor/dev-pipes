@@ -99,13 +99,6 @@ function App() {
           const network = await provider.getNetwork();
           const networkId = parseInt(network.chainId);
 
-          if(!networkId) {
-            tripleToast(
-              getText('error_network_unavailable'), getText('error_please_check_wallet'),
-              getText('text_then_reload')
-            );
-          }
-
           setNetworkId(networkId);
           setNetworkConfig({
             contractAddress: chainIdToAddress('devPipes', networkId),
@@ -158,6 +151,14 @@ function App() {
       }
       else if(networkId === 0x13881) {
         console.log('Network Matic Mumbai');
+      }
+
+      if(!networkId) {
+        tripleToast(
+          getText('error_network_unavailable'), 
+          getText('error_please_check_wallet'),
+          getText('text_then_reload')
+        );
       }
 
       connectEthereum();

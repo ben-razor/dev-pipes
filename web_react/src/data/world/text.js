@@ -16,7 +16,7 @@ const text = {
     "text_project_published": `Publish complete`,
     "text_transaction_cancelled": `Transaction cancelled`,
     "text_no_project_results": `No published projects found`,
-    "text_then_reload": `The reload application`,
+    "text_then_reload": `Then reload application`,
     "success_image_upload": `Image uploaded`,
     "error_no_ethereum": `No wallet detected. Try Metamask!`,
     "error_project_created": 'Error creating project',
