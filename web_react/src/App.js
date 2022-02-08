@@ -799,10 +799,13 @@ function getTasksPage() {
   let ui;
 
   ui = <div className="br-page-panel">
+    <h3>Feature coming soon!</h3>
     You are not assigned to any tasks.
     <br />
     <br />
     Use the Search panel to view projects to apply for.
+    <br />
+    <br />
   </div>
 
     return <div className="br-tasks-page">
