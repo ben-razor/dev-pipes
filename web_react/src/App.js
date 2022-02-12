@@ -85,9 +85,9 @@ function App() {
     (async () => {
       if(window.ethereum) {
         let accounts;
-        const provider = new ethers.providers.Web3Provider(window.ethereum)
 
         try {
+          const provider = new ethers.providers.Web3Provider(window.ethereum)
           accounts = await provider.send("eth_requestAccounts", []);
 
           const signer = provider.getSigner();
@@ -125,6 +125,9 @@ function App() {
           console.log(e);
           if(e.code === -32002) {
             doubleToast(getText('error_metamask_accounts_pending'), getText('error_please_check_wallet'));
+          }
+          else {
+            toast('error_wallet_connect');
           }
         }
 
