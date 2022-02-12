@@ -19,7 +19,7 @@ const text = {
     "text_then_reload": `Then reload application`,
     "success_image_upload": `Image uploaded`,
     "error_no_ethereum": `No wallet detected. Try Metamask!`,
-    "error_wallet_connect": `Error connecting to wallet`,
+    "error_wallet_connect": `Error connecting to wallet`, 
     "error_project_created": 'Error creating project',
     "error_project_updated": 'Error updating project',
     "error_invalid_network": `Network is not supported`,
