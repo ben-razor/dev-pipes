@@ -1,12 +1,86 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "/media/chrisb/crypto1/eth/dev-pipes/eth/contracts/DevPipes.sol": {
-      "lastModificationDate": 1644322317369,
-      "contentHash": "ee11f41324c9ade40700c75ee97d1e78",
+    "/home/chrisb/dev/crypto1/eth/dev-pipes/eth/contracts/DevPipes.sol": {
+      "lastModificationDate": 1648330765514,
+      "contentHash": "c3be4cf467b1a66651600157e111915d",
       "sourceName": "contracts/DevPipes.sol",
       "solcConfig": {
-        "version": "0.8.2",
+        "version": "0.8.6",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@opengsn/contracts/src/BaseRelayRecipient.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "DevPipes"
+      ]
+    },
+    "/home/chrisb/dev/crypto1/eth/dev-pipes/eth/node_modules/@opengsn/contracts/src/BaseRelayRecipient.sol": {
+      "lastModificationDate": 1648330066176,
+      "contentHash": "d88b74178c935209123074eab10678cc",
+      "sourceName": "@opengsn/contracts/src/BaseRelayRecipient.sol",
+      "solcConfig": {
+        "version": "0.8.6",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./interfaces/IRelayRecipient.sol"
+      ],
+      "versionPragmas": [
+        ">=0.6.9"
+      ],
+      "artifacts": [
+        "BaseRelayRecipient"
+      ]
+    },
+    "/home/chrisb/dev/crypto1/eth/dev-pipes/eth/node_modules/@opengsn/contracts/src/interfaces/IRelayRecipient.sol": {
+      "lastModificationDate": 1648330066184,
+      "contentHash": "6ed61fbbd3eab84648d82c99d1541fdf",
+      "sourceName": "@opengsn/contracts/src/interfaces/IRelayRecipient.sol",
+      "solcConfig": {
+        "version": "0.8.6",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -30,10 +104,10 @@
       },
       "imports": [],
       "versionPragmas": [
-        "^0.8.0"
+        ">=0.6.0"
       ],
       "artifacts": [
-        "DevPipes"
+        "IRelayRecipient"
       ]
     }
   }

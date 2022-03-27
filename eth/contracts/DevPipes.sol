@@ -2,10 +2,11 @@
 // Solidity files have to start with this pragma.
 // It will be used by the Solidity compiler to validate its version.
 pragma solidity ^0.8.0;
+import "@opengsn/contracts/src/BaseRelayRecipient.sol";
 
 
 // This is the main building block for smart contracts.
-contract DevPipes {
+contract DevPipes is BaseRelayRecipient {
     // Some string type variables to identify the token.
     // The `public` modifier makes a variable readable from outside the contract.
     string public name;
@@ -64,9 +65,10 @@ contract DevPipes {
     event SubProjectCreated(address indexed _creator, uint256 indexed _id, uint256 indexed rootId, uint256 parentId);
     event ProjectPublished(uint256 indexed _id);
 
-    function init() public {
+    function init(address _trustedForwarder) public {
         if(owner == address(0)) {
-            owner = msg.sender;
+            _setTrustedForwarder(_trustedForwarder);
+            owner = _msgSender();
             name = "Dev Pipes";
             symbol = "PIPES";
             balance = 0;
@@ -82,14 +84,16 @@ contract DevPipes {
     function createProject(string memory projectName, string memory description, string memory uri, 
                            string memory tags, uint256 dueDate, uint256 budget) public {
 
+        address sender = _msgSender();
+
         Project memory project = Project(
-            projectIndex, 0, 0, msg.sender, projectName, description, uri, tags, dueDate, budget, 0 
+            projectIndex, 0, 0, sender, projectName, description, uri, tags, dueDate, budget, 0 
         );
 
         projects.push(project);
-        userProjects[msg.sender].push(projectIndex);
+        userProjects[sender].push(projectIndex);
 
-        emit ProjectCreated(msg.sender, projectIndex);
+        emit ProjectCreated(sender, projectIndex);
 
         projectIndex++;
     }
@@ -97,9 +101,10 @@ contract DevPipes {
     function editProject(uint256 projectId, string memory projectName, string memory description, string memory uri, 
                            string memory tags, uint256 dueDate, uint256 budget) public {
 
+        address sender = _msgSender();
         assertProjectExists(projectId);
         Project storage proj = projects[projectId];
-        require(proj.creator == msg.sender, "error_only_project_creator_can_edit");
+        require(proj.creator == sender, "error_only_project_creator_can_edit");
         // require(proj.status == 0, "error_published_projects_cannot_be_edited"); 
 
         proj.name = projectName;
@@ -109,7 +114,7 @@ contract DevPipes {
         proj.dueDate = dueDate;
         proj.budget = budget;
 
-        emit ProjectEdited(msg.sender, projectId);
+        emit ProjectEdited(sender, projectId);
     }
 
     function assertProjectExists(uint256 projectId) internal view {
@@ -119,6 +124,7 @@ contract DevPipes {
     function createSubProject(uint256 parentId, string memory projectName, string memory description, string memory uri, 
                               string memory tags, uint256 dueDate, uint256 budget) public {
 
+        address sender = _msgSender();
         assertProjectExists(parentId);
         Project memory proj = projects[parentId];
         uint256 rootId = proj.rootId;
@@ -128,14 +134,14 @@ contract DevPipes {
         }
 
         Project memory project = Project(
-            projectIndex, parentId, rootId, msg.sender, projectName, description, uri, tags, dueDate, budget, 0
+            projectIndex, parentId, rootId, sender, projectName, description, uri, tags, dueDate, budget, 0
         );
 
         projects.push(project);
         subProjects[rootId].push(projectIndex);
-        userProjects[msg.sender].push(projectIndex);
+        userProjects[sender].push(projectIndex);
 
-        emit SubProjectCreated(msg.sender, projectIndex, rootId, parentId);
+        emit SubProjectCreated(sender, projectIndex, rootId, parentId);
         projectIndex++;
     }
 
@@ -156,16 +162,18 @@ contract DevPipes {
     }
 
     function withdrawApplication(uint256 applicationId) public {
+        address sender = _msgSender();
         Application storage application = applications[applicationId];
-        require(application.applicant == msg.sender, "error_only_application_creator_can_edit");
+        require(application.applicant == sender, "error_only_application_creator_can_edit");
         application.status = 1;
     }
 
     function addRoyalty(uint256 projectId, address user, uint256 amount) public {
+        address sender = _msgSender();
         assertProjectExists((projectId));
         Project memory proj = projects[projectId];
 
-        require(proj.creator == msg.sender, "error_only_project_creator_can_edit");
+        require(proj.creator == sender, "error_only_project_creator_can_edit");
 
         uint256 total = this.getRoyaltiesTotal(projectId);
 
@@ -180,9 +188,10 @@ contract DevPipes {
     }
 
     function publish(uint256 projectId) public {
+        address sender = _msgSender();
         assertProjectExists((projectId));
         Project storage proj = projects[projectId];
-        require(proj.creator == msg.sender, "error_only_project_creator_can_edit");
+        require(proj.creator == sender, "error_only_project_creator_can_edit");
         proj.status = 1;
         emit ProjectPublished(projectId);
     } 
@@ -217,5 +226,9 @@ contract DevPipes {
     
     function getAllProjects() external view returns(Project[] memory) {
         return projects;
+    }
+
+    function versionRecipient() external view override returns (string memory) {
+        return "1";
     }
 }

@@ -2,6 +2,11 @@
 const { Description } = require("@ethersproject/properties");
 const { expect } = require("chai");
 
+const biconomyForwarderAddress = '0x84a0856b038eaAd1cC7E297cF34A7e72685A8693';
+const rinkebyForwarderAddress = '0xFD4973FeB2031D4409fB57afEE5dF2051b171104';
+const maticForwarderAddress = '0x86C80a8aa58e0A4fa09A69624c31Ab2a6CAD56b8';
+const mumbaiForwarderAddress = '0x9399BB24DBB5C4b782C70c2969F58716Ebbd6a3b';
+
 // `describe` is a Mocha function that allows you to organize your tests. It's
 // not actually needed, but having your tests organized makes debugging them
 // easier. All Mocha functions are available in the global scope.
@@ -37,7 +42,7 @@ describe("DevPipes contract", function () {
     // for it to be deployed(), which happens once its transaction has been
     // mined.
     hardhatDevPipes = await DevPipes.deploy();
-    hardhatDevPipes.init();
+    hardhatDevPipes.init(rinkebyForwarderAddress);
   });
 
   // You can nest describe calls to create subsections.
