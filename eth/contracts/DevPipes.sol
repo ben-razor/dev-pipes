@@ -121,6 +121,15 @@ contract DevPipes is BaseRelayRecipient {
         require(projectId <= projectIndex - 1, "error_project_does_not_exist");
     }
 
+    function assertOnlyOwner() internal view {
+        require(owner == _msgSender(), "error_only_owner_can_do_this");
+    }
+
+    function setTrustedForwarder(address _forwarder) public {
+        assertOnlyOwner();
+        _setTrustedForwarder(_forwarder);
+    }
+
     function createSubProject(uint256 parentId, string memory projectName, string memory description, string memory uri, 
                               string memory tags, uint256 dueDate, uint256 budget) public {
 
@@ -228,7 +237,7 @@ contract DevPipes is BaseRelayRecipient {
         return projects;
     }
 
-    function versionRecipient() external view override returns (string memory) {
+    function versionRecipient() external pure override returns (string memory) {
         return "1";
     }
 }

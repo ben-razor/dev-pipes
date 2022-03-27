@@ -11,8 +11,11 @@ const { ethers, upgrades } = require("hardhat");
 let network = hre.network.name;
 let proxyAddress = '';
 let impAddress = '';
+let forwarderAddress = ''; // Biconomy forwarder for EIP-2771 gasless transactions
 
 if(network === 'polygon') {
+  forwarderAddress = '0x86C80a8aa58e0A4fa09A69624c31Ab2a6CAD56b8';
+
   // proxyAddress = '0xb671A76Fe1Ee4E8535d827AdD0b260Ab71A124a9';
   // impAddress = '0x2649B83A236991176a5B9B2a51174e992d27e536';
 
@@ -20,11 +23,16 @@ if(network === 'polygon') {
   impAddress = '0x38C73961E4147cad754dab0dB9615Cf7a87040D8';
 }
 else if(network === 'ropsten') {
+  forwarderAddress = '0x3D1D6A62c588C1Ee23365AF623bdF306Eb47217A'; 
+
   // proxyAddress = '0x8D0676Da7F8A4Ae60f988beD23006f919f044756';
   // impAddress = '0x1DBFCaE8139dcB39b9e5AeCb8BC37460e9947f50';
 
-  proxyAddress = '0x4FFBB5fEa02d16e47bB769880f4C8d6024505714';
-  impAddress = '0x1DBFCaE8139dcB39b9e5AeCb8BC37460e9947f50';
+  // proxyAddress = '0x4FFBB5fEa02d16e47bB769880f4C8d6024505714';
+  // impAddress = '0x1DBFCaE8139dcB39b9e5AeCb8BC37460e9947f50';
+
+  proxyAddress = '0x3d03c70FdF9fB90EA8daf9964B3961Ddf3aEE069';
+  impAddress = '0xE79ac02364BbA88BC56bab977955d5549f6afB5c';
 }
 
 async function main() {
@@ -55,7 +63,7 @@ async function main() {
 
   if(contractChanged) {
     let devPipes = await DevPipes.attach(res.address);
-    initRes = await devPipes.init();
+    initRes = await devPipes.init(forwarderAddress);
   }
 
   console.log("Init tx hash: ", initRes.hash);

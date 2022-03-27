@@ -4,6 +4,7 @@ const { expect } = require("chai");
 
 const biconomyForwarderAddress = '0x84a0856b038eaAd1cC7E297cF34A7e72685A8693';
 const rinkebyForwarderAddress = '0xFD4973FeB2031D4409fB57afEE5dF2051b171104';
+const ropstenForwarderAddress = '0x3D1D6A62c588C1Ee23365AF623bdF306Eb47217A';
 const maticForwarderAddress = '0x86C80a8aa58e0A4fa09A69624c31Ab2a6CAD56b8';
 const mumbaiForwarderAddress = '0x9399BB24DBB5C4b782C70c2969F58716Ebbd6a3b';
 

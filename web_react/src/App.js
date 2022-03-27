@@ -7,7 +7,7 @@ import BrButton from './js/components/lib/BrButton';
 import BrModal from './js/components/lib/BrModal.js';
 import './css/_base.css';
 import './css/_content.css';
-import getText from './data/world/text';
+import getText from './data/text';
 import { ethers } from 'ethers';
 import devPipesContract from './data/contract/DevPipes';
 import chainConfig, { chainIdToAddress, getAbi, validNetwork } from './data/chainConfig';
@@ -68,7 +68,7 @@ function App() {
   const [ nameSub, setNameSub ] = useState('');
   const [ subTree, setSubTree ] = useState();
 
-  let todaysDate = new Date().toISOString().substr(0, 16);
+  let todaysDate = new Date().toISOString().slice(0, 16);
   const [ projectEntry, setProjectEntry ] = useState({
     name: '', description: '', uri: '', tags: '', dueDate: todaysDate, budget: 0
   });
