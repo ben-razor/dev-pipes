@@ -31,7 +31,7 @@ const TOAST_TIMEOUT = 4000;
 
 function App() {
 
-  function toast(message, type='info') {
+  const toast = useCallback((message, type='info') => {
     toasty[type](message, { 
       position: "top-right",
       autoClose: TOAST_TIMEOUT,
@@ -42,7 +42,7 @@ function App() {
       progress: undefined,
       theme: 'light'
     });
-  }
+  }, []);
 
   const tripleToast = useCallback((message1, message2, message3, type='info') => {
     toast( <Fragment><div>{message1}</div><div>{message2}</div><div>{message3}</div></Fragment>, type)
@@ -143,7 +143,7 @@ function App() {
         setError('error_no_ethereum');
       }
     })();
-  }, []);
+  }, [toast, doubleToast]);
 
   useEffect(() => {
     let networkChanged = stateCheck.changed('netChanged1', networkId);
@@ -173,7 +173,7 @@ function App() {
 
       connectEthereum();
     }
-  }, [networkId, connectEthereum]);
+  }, [networkId, connectEthereum, tripleToast]);
 
   useEffect(() => {
     let networkChanged = stateCheck.changed('netChanged2', networkId);
@@ -331,20 +331,20 @@ function App() {
           x.Children = [];
           keys.push(x[key]);
       });
-      var roots = treeData.filter(function(x){return keys.indexOf(x[parentKey])==-1});
+      var roots = treeData.filter(function(x){return keys.indexOf(x[parentKey]) === -1});
       var nodes = [];
       roots.map(function(x){nodes.push(x)});
       while(nodes.length > 0)
       {
-
           var node = nodes.pop();
-          var children =  treeData.filter(function(x){return x[parentKey] == node[key]});
+          var children =  treeData.filter(function(x){return x[parentKey] === node[key]});
           children.map(function(x){
               node.Children.push(x);
-              nodes.push(x)
+              nodes.push(x);
+              return;
           });
       }
-      if (roots.length==1) return roots[0];
+      if (roots.length === 1) return roots[0];
       return roots;
   }
 
@@ -984,18 +984,10 @@ function getTasksPage() {
     overlay: {zIndex: 999}
   };
 
-  function closeModal() {
-    setModalState({...modalState, open: false});
-  }
-
   const [modalIsOpen, setIsOpen] = React.useState(false);
 
   function openModal() {
     setIsOpen(true);
-  }
-
-  function afterOpenModal() {
-
   }
 
   function closeModal() {
@@ -1007,7 +999,6 @@ function getTasksPage() {
     <div>
       <Modal
         isOpen={modalIsOpen}
-        onAfterOpen={afterOpenModal}
         onRequestClose={closeModal}
         style={customStyles}
         contentLabel="Example Modal"
