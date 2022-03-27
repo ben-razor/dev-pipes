@@ -14,6 +14,9 @@ const chainConfig = {
       address: {
         'rop': '0x3d03c70FdF9fB90EA8daf9964B3961Ddf3aEE069',
         'matic': '0x7fa0da86Cfc7c08800252Acb1FA4bb0e99ecF54d'
+      },
+      biconomy_api_key: {
+        'rop': 'kAaHk8t-e.720fe16b-5762-4323-8f5a-e1b5ceebbccb'
       }
     }
   }

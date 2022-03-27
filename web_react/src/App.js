@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback, Fragment } from 'react';
 import web3modal from './js/helpers/web3modal';
 import Logo from './images/dev-pipes-2.png';
 import Infographic from './images/infographic-1.png';
-import { useToasts } from 'react-toast-notifications';
+import { toast as toasty } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import BrButton from './js/components/lib/BrButton';
 import BrModal from './js/components/lib/BrModal.js';
 import './css/_base.css';
@@ -16,6 +17,7 @@ import { StateCheck } from './js/helpers/helpers';
 import UAuth from '@uauth/js';
 import Modal from 'react-modal';
 import { display } from '@uauth/web3modal';
+import {Biconomy} from "@biconomy/mexa";
 
 const stateCheck = new StateCheck();
 
@@ -29,16 +31,18 @@ const TOAST_TIMEOUT = 4000;
 
 function App() {
 
-  const { addToast } = useToasts();
-
-  const toast = useCallback((message, type='info') => {
-    console.log('toasty ', message);
-    addToast(message, { 
-      appearance: type,
-      autoDismiss: true,
-      autoDismissTimeout: TOAST_TIMEOUT
+  function toast(message, type='info') {
+    toasty[type](message, { 
+      position: "top-right",
+      autoClose: TOAST_TIMEOUT,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light'
     });
-  }, [addToast]);
+  }
 
   const tripleToast = useCallback((message1, message2, message3, type='info') => {
     toast( <Fragment><div>{message1}</div><div>{message2}</div><div>{message3}</div></Fragment>, type)
@@ -87,7 +91,11 @@ function App() {
         let accounts;
 
         try {
-          const provider = new ethers.providers.Web3Provider(window.ethereum)
+          let provider = new ethers.providers.Web3Provider(window.ethereum)
+          const biconomy_api_key = chainConfig.contracts.devPipes.biconomy_api_key.rop;
+          console.log('BI API KEY', biconomy_api_key);
+          const biconomy = new Biconomy(provider, { apiKey: biconomy_api_key, debug: true} );
+          provider = new ethers.providers.Web3Provider(biconomy);
           accounts = await provider.send("eth_requestAccounts", []);
 
           const signer = provider.getSigner();
@@ -95,7 +103,6 @@ function App() {
           setAccounts(accounts);
           setProvider(provider);
           setSigner(signer);
-          console.log('Pre getNetwork');
           const network = await provider.getNetwork();
           const networkId = parseInt(network.chainId);
 
@@ -181,7 +188,7 @@ function App() {
     if(provider) {
       (async () => {
         try {
-          console.log('bal ', await provider.getBalance(accounts[0]));
+          await provider.getBalance(accounts[0]);
         }
         catch(e) {
           console.log('Cannot get balance');
@@ -195,9 +202,7 @@ function App() {
     console.log('Network', networkChanged, networkConfig, validNetwork(networkId), networkId);
     if(networkChanged && validNetwork(networkId)) {
       try {
-        console.log('pre contract');
         let contract = new ethers.Contract(networkConfig.contractAddress, networkConfig.abi, signer);
-        console.log('post contract');
         if(contract) {
           console.log('contract', contract);
           setContract(contract);
@@ -379,7 +384,6 @@ function App() {
         setAccounts(accounts);
         setProvider(provider);
         setSigner(signer);
-        console.log('Pre getNetwork');
         const network = await provider.getNetwork();
         const networkId = parseInt(network.chainId);
         setNetworkId(networkId);
@@ -387,7 +391,6 @@ function App() {
           contractAddress: chainIdToAddress('devPipes', networkId),
           abi: getAbi('devPipes')
         })
-        console.log('Post getNetwork');
 
         window.ethereum.removeAllListeners("chainChanged");
         window.ethereum.removeAllListeners("accountsChanged");
@@ -512,7 +515,6 @@ function App() {
         }
       }
       catch(e) {
-        console.log('EEEE', e);
         if(e.error && e.error.code === -32603) {
           toast(getText(e.error.message.replace('execution reverted: ', '')))
           console.log(e);
@@ -682,7 +684,6 @@ function App() {
   }
 
   function selectProject(id) {
-    console.log('selecting ', id);
     let _activeProject = {};
     for(let proj of allProjects) {
       let projID = proj[0].toString();
@@ -695,7 +696,6 @@ function App() {
   }
 
   function publishProject(projId) {
-    console.log(projId);
     if(projId && contract) {
       (async () => {
         let tx = await contract.publish(projId);
