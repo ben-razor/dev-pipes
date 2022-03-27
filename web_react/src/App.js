@@ -29,6 +29,8 @@ const uauth = new UAuth({
 
 const TOAST_TIMEOUT = 4000;
 
+let biconomy;
+
 function App() {
 
   const toast = useCallback((message, type='info') => {
@@ -56,9 +58,11 @@ function App() {
   const [ networkConfig, setNetworkConfig ] = useState({});
   const [ networkId, setNetworkId ] = useState();
   const [ provider, setProvider ] = useState();
+  const [ gaslessSigner, setGaslessSigner ] = useState();
   const [ signer, setSigner ] = useState();
   const [ contract, setContract ] = useState();
   const [ contractAddress, setContractAddress ] = useState();
+  const [ gaslessContract, setGaslessContract ] = useState();
   const [ isSignedIn, setIsSignedIn ] = useState();
   const [ allProjects, setAllProjects ] = useState([]);
   const [ ownProjects, setOwnProjects ] = useState([]);
@@ -91,11 +95,9 @@ function App() {
         let accounts;
 
         try {
+
           let provider = new ethers.providers.Web3Provider(window.ethereum)
-          const biconomy_api_key = chainConfig.contracts.devPipes.biconomy_api_key.rop;
-          console.log('BI API KEY', biconomy_api_key);
-          const biconomy = new Biconomy(provider, { apiKey: biconomy_api_key, debug: true} );
-          provider = new ethers.providers.Web3Provider(biconomy);
+            
           accounts = await provider.send("eth_requestAccounts", []);
 
           const signer = provider.getSigner();
@@ -207,6 +209,33 @@ function App() {
           console.log('contract', contract);
           setContract(contract);
           setContractAddress(contract.address);
+
+          console.log('create biconomy 1')
+          const biconomy_api_key = chainConfig.contracts.devPipes.biconomy_api_key.rop;
+          const api_url = chainConfig.rpc_url.rop;
+          biconomy = new Biconomy(new ethers.providers.JsonRpcProvider(api_url),
+          {
+            walletProvider: window.ethereum, 
+            apiKey: biconomy_api_key, 
+            debug: true
+          });   
+          
+          console.log('create biconomy 2', networkConfig.abi)
+          
+          biconomy.onEvent(biconomy.READY, async () => {
+            let gaslessContract = new ethers.Contract(
+              networkConfig.contractAddress, 
+              networkConfig.abi, 
+              biconomy.getSignerByAddress(accounts[0])
+            );
+            setGaslessContract(gaslessContract);
+
+            console.log('create biconomy 4')
+          }).onEvent(biconomy.ERROR, (error, message) => {
+              // Handle error while initializing mexa
+              console.log(message);
+              console.log(error);
+          });
         }
       }
       catch(e) {
@@ -448,7 +477,8 @@ function App() {
       
       try {
         if(type === 'create') {
-          tx = await contract.createProject(
+          console.log('pre g');
+          tx = await gaslessContract.createProject(
             entryData.name, 
             entryData.description, 
             entryData.uri,
@@ -456,6 +486,7 @@ function App() {
             timeStamp,
             wei.toString()
           );
+          console.log('post g');
         }
         else if(type === 'edit') {
           console.log('Editing start!!');

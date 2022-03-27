@@ -7,6 +7,8 @@ if(isLocal()) {
   validNetworks.push(3);
 }
 
+let ALCHEMY_API_KEY='cpzVPh7btoQR-urxOVQ3yOokLZVeHCjP';
+
 const chainConfig = {
   contracts: {
     'devPipes': {
@@ -17,8 +19,11 @@ const chainConfig = {
       },
       biconomy_api_key: {
         'rop': 'kAaHk8t-e.720fe16b-5762-4323-8f5a-e1b5ceebbccb'
-      }
+      },
     }
+  },
+  rpc_url: {
+    'rop': `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_API_KEY}`
   }
 }
 
