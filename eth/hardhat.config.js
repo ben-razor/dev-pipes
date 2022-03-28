@@ -17,18 +17,25 @@ module.exports = {
       accounts: [`${process.env.ACCOUNT}`]
     },
     rinkeby: {
-      url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
+      url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.RINKEBY_API_KEY}`,
       accounts: [`${process.env.ACCOUNT}`]
     },
     polygon: {
       url: `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
+      accounts: [`${process.env.ACCOUNT}`]
+    },
+    mumbai: {
+      chainId: 80001,
+      url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY_MUMBAI}`,
       accounts: [`${process.env.ACCOUNT}`]
     }
   },
   etherscan: {
     apiKey: {
       ropsten: process.env.ETHERSCAN_API_KEY,
-      polygon: process.env.POLYGON_API_KEY
+      rinkeby: process.env.ETHERSCAN_API_KEY,
+      polygon: process.env.POLYGONSCAN_API_KEY,
+      polygonMumbai: process.env.POLYGONSCAN_API_KEY
     }
   },
   dependencies: {

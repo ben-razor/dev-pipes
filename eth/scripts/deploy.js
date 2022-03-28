@@ -9,6 +9,7 @@
  */
 const { ethers, upgrades } = require("hardhat");
 let network = hre.network.name;
+console.log('NETWORK', network);
 let proxyAddress = '';
 let impAddress = '';
 let forwarderAddress = ''; // Biconomy forwarder for EIP-2771 gasless transactions
@@ -33,6 +34,18 @@ else if(network === 'ropsten') {
 
   proxyAddress = '0x3d03c70FdF9fB90EA8daf9964B3961Ddf3aEE069';
   impAddress = '0xE79ac02364BbA88BC56bab977955d5549f6afB5c';
+}
+else if(network === 'rinkeby') {
+  forwarderAddress = '0xFD4973FeB2031D4409fB57afEE5dF2051b171104';
+
+  proxyAddress = '0x1DBFCaE8139dcB39b9e5AeCb8BC37460e9947f50';
+  impAddress = '0x21736A92de4b6619644f516FD5DF0aFa2b85CC9f'; 
+}
+else if(network === 'mumbai') {
+  forwarderAddress = '0x9399BB24DBB5C4b782C70c2969F58716Ebbd6a3b';
+
+  proxyAddress = '0x6aaD449C1aD2513751752a3cCB721c06811B794c';
+  impAddress = '0x742a63530FC9982218490cda497B3F27dF836b51'; 
 }
 
 async function main() {

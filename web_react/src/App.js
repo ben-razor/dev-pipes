@@ -11,9 +11,9 @@ import './css/_content.css';
 import getText from './data/text';
 import { ethers } from 'ethers';
 import devPipesContract from './data/contract/DevPipes';
-import chainConfig, { chainIdToAddress, getAbi, validNetwork } from './data/chainConfig';
+import chainConfig, { chainIdToAddress, chainIdToField, getAbi, validNetwork } from './data/chainConfig';
 import env from './data/udConfig';
-import { StateCheck } from './js/helpers/helpers';
+import { isLocal, StateCheck } from './js/helpers/helpers';
 import UAuth from '@uauth/js';
 import Modal from 'react-modal';
 import { display } from '@uauth/web3modal';
@@ -111,7 +111,8 @@ function App() {
           setNetworkId(networkId);
           setNetworkConfig({
             contractAddress: chainIdToAddress('devPipes', networkId),
-            abi: getAbi('devPipes')
+            abi: getAbi('devPipes'),
+            shortName: chainIdToField(networkId, 'shortName')
           })
           console.log('Post getNetwork');
 
@@ -157,6 +158,9 @@ function App() {
       }
       else if(networkId === 3) {
         console.log('Network Ropsten');
+      }
+      else if(networkId === 4) {
+        console.log('Network Rinkeby');
       }
       else if(networkId === 0x89) {
         console.log('Network Matic');
@@ -210,17 +214,15 @@ function App() {
           setContract(contract);
           setContractAddress(contract.address);
 
-          console.log('create biconomy 1')
-          const biconomy_api_key = chainConfig.contracts.devPipes.biconomy_api_key.rop;
-          const api_url = chainConfig.rpc_url.rop;
+          const biconomy_api_key = chainConfig.contracts.devPipes.biconomy_api_key[networkConfig.shortName];
+          const api_url = chainConfig.rpc_url[networkConfig.shortName];
+          console.log('biconomy details: ', biconomy_api_key, api_url);
           biconomy = new Biconomy(new ethers.providers.JsonRpcProvider(api_url),
           {
             walletProvider: window.ethereum, 
             apiKey: biconomy_api_key, 
             debug: true
           });   
-          
-          console.log('create biconomy 2', networkConfig.abi)
           
           biconomy.onEvent(biconomy.READY, async () => {
             let gaslessContract = new ethers.Contract(
@@ -484,7 +486,8 @@ function App() {
             entryData.uri,
             cleanedTags,
             timeStamp,
-            wei.toString()
+            wei.toString(),
+            {gasLimit: 500000}
           );
           console.log('post g');
         }
@@ -1083,7 +1086,12 @@ function getTasksPage() {
                 :
                 (
                   !validNetwork(networkId) ?
-                    <div className="br-info-message">{getText('text_network_info')}</div>
+                    (
+                      isLocal() ? 
+                        <div className="br-info-message">{getText('text_network_info_test')}</div>
+                      :
+                        <div className="br-info-message">{getText('text_network_info')}</div>
+                    )
                     :
                     ''
                 )
